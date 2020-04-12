@@ -41,19 +41,27 @@ export default {
   },
   methods: {
     handleSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       this.$refs[name].validate((valid) => {
         if (valid) {
           this.$store.dispatch('user/userLogin', {
             formLogin: this.formLogin,
             success: () => {
-              this.$router.go(-1)
+              this.$router.push("/")
+            },
+            fail: (info) => {
+              this.$Message.error(info)
             }
           })
         } else {
+          this.$store.commit("switchLoading", !1)
           this.$Message.error('输入的信息有误，请重新输入。')
         }
       })
     }
+  },
+  created () {
+    this.$store.commit("switchLoading", !1)
   }
 }
 </script>

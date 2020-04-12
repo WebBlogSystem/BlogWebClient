@@ -46,9 +46,25 @@ export default {
       up: {}
     }
   },
-  props: ['essay', 'userId', 'essayListFrom'],
+  props: ['essay', 'userId', 'essayListFrom', 'essayIndex'],
   created () {
     this.getUps()
+    this.$store.commit("switchLoading", !1)
+  },
+  watch: {
+    essay (newVal) {
+      this.essay = newVal
+      this.getUps()
+    },
+    userId (newVal) {
+      this.userId = newVal
+    },
+    essayListFrom (newVal) {
+      this.essayListFrom = newVal
+    },
+    essayIndex (newVal) {
+      this.essayIndex = newVal
+    }
   },
   methods: {
     getUps () {
@@ -75,6 +91,7 @@ export default {
       this.$router.push({ path: "/otheruser/essaydetail", query: { userId, essayId } })
     },
     deleteEssay (essayId) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -82,7 +99,7 @@ export default {
         this.$store.dispatch("essay/deleteEssay", {
           essayId,
           success: () => {
-            _this.$router.go(0)
+            _this.$emit("deleteEssay", _this.essayIndex)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -102,6 +119,7 @@ export default {
 }
 #essayBriefInfo .checkStatus{
   margin-right: 40px;
+  width: 100px;
 }
 #essayBriefInfo .essayItem{
   height:60px;
@@ -128,5 +146,11 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.date{
+  width: 146px;
+}
+.goodnum{
+  width: 96px;
 }
 </style>

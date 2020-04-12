@@ -4,15 +4,16 @@
       <div v-if="attentionList.length <= 0">
         当前没有关注
       </div>
-      <div v-else class="item" v-for="(item, index) in attentionList" :key="index">
-        <div class="line" @click="goUserIndex(item)">
-          <avatar :imgId="item.imgid"/>
-        </div>
-        <div class="line" @click="goUserIndex(item)">{{item.username}}</div>
-        <div class="line">
-          <Button size="small" type="dashed" @click="deleteAttention(item.id, index)">取消关注</Button>
-        </div>
-        <Divider type="vertical" dashed/>
+      <div v-else v-for="(item, index) in attentionList" :key="index">
+        <Card :bordered="true" class="customCard item">
+          <div class="line" @click="goUserIndex(item)">
+            <avatar :imgId="item.imgid"/>
+          </div>
+          <div class="line" @click="goUserIndex(item)">{{item.username}}</div>
+          <div class="line">
+            <Button size="small" type="dashed" @click="deleteAttention(item.id, index)">取消关注</Button>
+          </div>
+        </Card>
       </div>
     </div>
   </div>
@@ -27,7 +28,7 @@ export default {
     }
   },
   created () {
-    if (this.userinfo.id) {
+    if (this.userInfo.id) {
       this.getAttention()
     }
     this.$store.commit("social/setLeftCurrent", 3)
@@ -43,6 +44,7 @@ export default {
   },
   methods: {
     goUserIndex (user) {
+      this.$store.commit("switchLoading", !0)
       this.$router.push({ path: "/otheruser/essaylist", query: { userId: user.id } })
     },
     getAttention () {
@@ -70,7 +72,7 @@ export default {
           fromUserId: this.userInfo.id,
           toUserId: userId,
           success: () => {
-            this.$router.go(0)
+            this.attentionList.splice(index, 1)
           },
           fail: () => {
             this.$router.push("/logincenter/login")
@@ -91,12 +93,12 @@ export default {
 }
 .attention .item{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right:10px;
-    margin-bottom: 10px;
-    width: 70px;
+    flex-wrap: wrap;
+    margin-right:20px;
+    margin-bottom: 20px;
+    width: 100px;
     flex-grow: 0;
     flex-shrink: 0;
+    text-align: center;
 }
 </style>

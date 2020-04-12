@@ -60,6 +60,9 @@ export default {
           } else if (userIndex === 1) {
             this.toUser = user
           }
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("user/getUserByUserId", user_params)
@@ -85,6 +88,7 @@ export default {
             })
           },
           onOk: () => {
+            this.$store.commit("switchLoading", !0)
             var msg = _this.msg.replace(/(^\s*)|(\s*$)/g, "")
             if (msg.length > 0 && msg.length <= 50) {
               var reply_param = {
@@ -102,6 +106,7 @@ export default {
               }
               this.$store.dispatch("reply/addReply", reply_param)
             } else {
+              this.$store.commit("switchLoading", !1)
               this.$Message.error("信息长度在1-50位之间")
             }
           }

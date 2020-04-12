@@ -21,7 +21,7 @@ export default {
     display: flex;
   }
   .UserWrap .right{
-    padding: 20px;
+    padding-left: 20px;
     width: 75%;
   }
 </style>

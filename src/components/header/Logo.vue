@@ -11,9 +11,10 @@
     display: flex;
     align-items: center;
     margin-top:-5px;
-    color:skyblue;
+    color:#2d8cf0;;
   }
   .username{
     margin-left:12px;
+    font-size: 20px;
   }
 </style>

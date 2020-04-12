@@ -6,25 +6,27 @@
       </div>
       <div v-else>
         <Scroll :on-reach-bottom="!isCommentFinish ? bottomAddComment : stopAddComment" height="600">
-          <div class="item" v-for="(item, index) in commentList" :key="index">
-            <div class="line">
-              <div class="left">
-                <span class="mr10">({{item.comment.createtime}})</span>
-                <Button type="dashed" size="small" @click="deleteComment(item.comment.id, index)">删除评论</Button>
-              </div>
-              <div class="right">
-                <span class="mr10">您在</span>
-                <a @click="goOtherEssayDetail(item.essay)" class="mr10 essaylink fc">{{item.essay.title}}</a>
-                <span>文章中评论了：</span>
-              </div>
-            </div>
-            <div class="line">
-              <Poptip trigger="hover" title="当前评论内容" :content="item.comment.msg">
-                <div class="content">
-                  {{item.comment.msg}}
+          <div v-for="(item, index) in commentList" :key="index">
+            <Card :bordered="true" class="customCard item">
+              <div class="line">
+                <div class="left">
+                  <span class="mr10">({{item.comment.createtime}})</span>
+                  <Button type="dashed" size="small" @click="deleteComment(item.comment.id, index)">删除评论</Button>
                 </div>
-              </Poptip>
-            </div>
+                <div class="right">
+                  <span class="mr10">您在</span>
+                  <a @click="goOtherEssayDetail(item.essay)" class="mr10 essaylink fc">{{item.essay.title}}</a>
+                  <span>文章中评论了：</span>
+                </div>
+              </div>
+              <div class="line">
+                <Poptip trigger="hover" title="当前评论内容" :content="item.comment.msg">
+                  <div class="content">
+                    {{item.comment.msg}}
+                  </div>
+                </Poptip>
+              </div>
+            </Card>
             <Divider v-if="!(index === (commentList.length - 1))" dashed />
           </div>
           <Divider v-if="isCommentFinish" size="small" class="fs10" dashed>已经到底了</Divider>
@@ -55,6 +57,7 @@ export default {
   },
   methods: {
     goOtherEssayDetail (essay) {
+      this.$store.commit("switchLoading", !0)
       this.$router.push({ path: '/otheruser/essaydetail', query: { essayId: essay.id, userId: essay.userId } })
     },
     getCommentsByUserId () {
@@ -62,7 +65,7 @@ export default {
         this.$router.push("/logincenter/login")
       } else {
         var _this = this
-        var comment_params = {
+        var commentParams = {
           userId: this.userInfo.id,
           page: ++this.commentPage,
           success: (list) => {
@@ -75,27 +78,57 @@ export default {
             _this.$router.push("/logincenter/login")
           }
         }
-        this.$store.dispatch("comment/getCommentsByUserId", comment_params)
+        this.$store.dispatch("comment/getCommentsByUserId", commentParams)
       }
     },
     deleteComment (commentId, commentIndex) {
-      if (!this.userInfo.id) {
-        this.$router.push("/logincenter/login")
+      var _this = this
+      _this.$store.commit("switchLoading", !0)
+      if (!_this.userInfo.id) {
+        _this.$router.push("/logincenter/login")
       } else {
-        var _this = this
-        var comment_params = {
+        var commentParams = {
           commentId,
           success: () => {
-            this.$router.go(0)
+            this.$Message.success("删除成功")
+            var fromPage = Math.floor(commentIndex / 10) + 1
+            _this.commentList.length = (fromPage - 1) * 10
+            var pages = []
+            if (_this.commentList.length % 10 === 1) {
+              _this.page--
+            }
+            for (let i = fromPage, j = 0; i <= _this.page; i++, j++) {
+              pages[j] = i
+            }
+            pages = pages.map(item => {
+              return new Promise((resolve, reject) => {
+                var commentParam = {
+                  page: item,
+                  userId: this.userInfo.id,
+                  success: (list) => {
+                    resolve(list)
+                  }
+                }
+                _this.$store.dispatch("comment/getCommentsByUserId", commentParam)
+              })
+            })
+            Promise.all(pages).then(function (commentList) {
+              commentList.map(item => {
+                _this.commentList = _this.commentList.concat(item)
+                _this.isFinish = item.length < 10
+              })
+              _this.$store.commit("switchLoading", !1)
+            })
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
           }
         }
-        this.$store.dispatch("comment/deleteComment", comment_params)
+        _this.$store.dispatch("comment/deleteComment", commentParams)
       }
     },
     bottomAddComment () {
+      this.$store.commit("switchLoading", !0)
       return new Promise(resolve => {
         this.getCommentsByUserId()
         resolve()

@@ -24,22 +24,9 @@ const actions = {
         commit('setUserInfo', data.res)
         param.success()
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
-  },
-  getOtherUser ({ commit, state }, param) {
-    userApi.getUser(param).then(
-      (response) => {
-        var data = response.data
-        if (data.flag) {
-          commit('setOtherUser', data.res)
-          param.success(data.res)
-        } else {
-          ViewUI.Message.error(data.info)
-        }
-      }
-    )
   },
   setPassword ({ commit, state }, param) {
     userApi.setPassword(param).then((response) => {
@@ -78,7 +65,7 @@ const actions = {
         if (data.flag) {
           param.success(data.res)
         } else {
-          ViewUI.Message.error(data.info)
+          param.fail(data.info)
         }
       }
     )
@@ -90,7 +77,7 @@ const actions = {
         if (data.flag) {
           param.success()
         } else {
-          ViewUI.Message.error(data.info)
+          param.fail(data.info)
         }
       }
     )

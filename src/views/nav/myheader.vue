@@ -56,6 +56,7 @@ export default {
   padding:8px 50px;
   display: flex;
   justify-content: space-between;
+  background-color: transparent;
 }
 .headerMenu .right{
   display: flex;

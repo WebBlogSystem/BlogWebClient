@@ -19,7 +19,7 @@ const actions = {
       if (data.flag) {
         param.success(data.res)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },
@@ -30,7 +30,7 @@ const actions = {
         data = data.res
         param.success(data.list)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },
@@ -84,18 +84,7 @@ const actions = {
       if (data.flag) {
         param.success(data.res)
       } else {
-        ViewUI.Message.error(data.info)
-      }
-    })
-  },
-  getEssayByCateId ({ commit, state }, param) {
-    essayApi.getEssayByCateId(param).then(function (response) {
-      var data = response.data
-      if (data.flag) {
-        data = data.res
-        param.success(data.list)
-      } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },
@@ -106,7 +95,7 @@ const actions = {
         data = data.res
         param.success(data)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },

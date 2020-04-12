@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="leftBottom">
-      <Menu :active-name="cateId" :open-names="['4']">
+      <Menu :active-name="cateId" :open-names="['4']" class="customMenu">
           <Submenu name="4">
               <template slot="title">
                   <Icon type="ios-cog" />
@@ -51,16 +51,7 @@ export default {
     }
   },
   created () {
-    var userId = parseInt(this.$route.query.userId)
-    if (this.$route.query.cateId) {
-      this.cateId = parseInt(this.$route.query.cateId)
-    }
-    this.getUser(userId)
-    this.getCates(userId)
-    if (this.userInfo.id) {
-      this.getLetter(userId)
-      this.getAttention(userId)
-    }
+    this.initData()
   },
   watch: {
     $route (to, from) {
@@ -69,18 +60,26 @@ export default {
       this.cateList = []
       this.cateId = 0
       this.letterType = 0
-      var userId = parseInt(to.query.userId)
-      if (to.query.cateId) {
-        this.cateId = parseInt(to.query.cateId)
-      }
-      this.getUser(userId)
-      this.getCates(userId)
-      if (this.userInfo.id) {
-        this.getLetter(userId)
-      }
+      this.initData()
     }
   },
   methods: {
+    initData () {
+      var userId = parseInt(this.$route.query.userId)
+      if (userId) {
+        if (this.$route.query.cateId) {
+          this.cateId = parseInt(this.$route.query.cateId)
+        }
+        this.getUser(userId)
+        this.getCates(userId)
+        if (this.userInfo.id) {
+          this.getLetter(userId)
+          this.getAttention(userId)
+        }
+      } else {
+        this.$router.replace("/")
+      }
+    },
     getLetter (userId) {
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
@@ -102,6 +101,7 @@ export default {
       }
     },
     addAttention (userId) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -111,6 +111,7 @@ export default {
           toUserId: userId,
           success: () => {
             _this.type = 1
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -120,6 +121,7 @@ export default {
       }
     },
     deleteAttention (userId) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -129,6 +131,7 @@ export default {
           toUserId: userId,
           success: () => {
             this.type = 0
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -138,6 +141,7 @@ export default {
       }
     },
     goCateEssayList (cateId) {
+      this.$store.commit("switchLoading", !0)
       this.$router.replace({ path: "/otheruser/essaylist", query: { userId: this.user.id, cateId } })
     },
     getUser (userId) {
@@ -149,6 +153,9 @@ export default {
           if (_this.userInfo.id) {
             _this.getAttention(this.user.id)
           }
+        },
+        fail: (info) => {
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("user/getUserByUserId", user_params)
@@ -181,11 +188,15 @@ export default {
         userId,
         success: (res) => {
           _this.cateList = _this.cateList.concat(res)
+        },
+        fail: (info) => {
+          _this.$Message.error(info)
         }
       }
       _this.$store.dispatch("cate/getCates", cate_params)
     },
     addLetter (userId) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -194,7 +205,6 @@ export default {
           userId1: this.userInfo.id,
           userId2: userId,
           success: (letter) => {
-            this.$store.commit("user/setUserInfo", letter.user)
             this.$router.push("/social/letter")
           },
           fail: () => {
@@ -230,5 +240,8 @@ export default {
 }
 .otherLeft .leftBottom{
   text-align: center;
+}
+.customMenu{
+  background-color: transparent;
 }
 </style>

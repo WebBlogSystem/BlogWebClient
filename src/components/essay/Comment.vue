@@ -14,7 +14,7 @@
       <span>{{comment.msg}}</span>
     </div>
     <Divider />
-    <div v-if="type">
+    <div v-if="type" class="ml10">
       <div v-for="(item, index) in replyList" :key="index">
         <reply :reply="item" @getReplyItem="getAddReplyItem"></reply>
       </div>
@@ -80,6 +80,9 @@ export default {
         commentsId: this.comment.id,
         success: (list) => {
           this.replyList = list
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("reply/getReplyByComment", comment_param)
@@ -105,6 +108,7 @@ export default {
             })
           },
           onOk: () => {
+            this.$store.commit("switchLoading", !0)
             var msg = _this.msg.replace(/(^\s*)|(\s*$)/g, "")
             if (msg.length > 0 && msg.length <= 50) {
               var reply_param = {
@@ -115,6 +119,7 @@ export default {
                 success: (reply) => {
                   _this.getReply()
                   _this.msg = ""
+                  this.$store.commit("switchLoading", !1)
                 },
                 fail: () => {
                   _this.$router.push("/logincenter/login")
@@ -130,6 +135,7 @@ export default {
     },
     getAddReplyItem () {
       this.getReply()
+      this.$store.commit("switchLoading", !1)
     }
   }
 }

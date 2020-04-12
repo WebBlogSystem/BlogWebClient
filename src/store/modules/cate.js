@@ -20,7 +20,7 @@ const actions = {
         data = data.res
         param.success(data)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },
@@ -31,7 +31,7 @@ const actions = {
         data = data.res
         param.success(data)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },
@@ -71,6 +71,31 @@ const actions = {
       if (data.islogin) {
         if (data.flag) {
           param.success()
+        } else {
+          ViewUI.Message.error(data.info)
+        }
+      } else {
+        param.fail()
+      }
+    })
+  },
+  getCateByCateId ({ commit, state }, param) {
+    cateApi.getCateByCateId(param).then(function (response) {
+      var data = response.data
+      if (data.flag) {
+        param.success(data.res)
+      } else {
+        param.fail(data.info)
+      }
+    })
+  },
+  editCate ({ commit, state }, param) {
+    cateApi.editCate(param).then(function (response) {
+      var data = response.data
+      if (data.islogin) {
+        if (data.flag) {
+          data = data.res
+          param.success(data)
         } else {
           ViewUI.Message.error(data.info)
         }

@@ -17,7 +17,8 @@ export default {
   getReplyByUserId (param) {
     return axios.post("/user/getReplyByUserId", {
       userId: param.userId,
-      page: param.page
+      page: param.page,
+      flag: param.flag
     })
   },
   deleteReply (param) {

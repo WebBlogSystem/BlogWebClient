@@ -5,13 +5,14 @@
         没有粉丝
       </div>
       <div v-else>
-        <div class="item" v-for="(item, index) in fanList" :key="index" @click="goUserIndex(item)">
-          <div class="line">
-            <avatar :imgId="item.imgid"/>
-          </div>
-          <div class="line">{{item.username}}</div>
+        <div v-for="(item, index) in fanList" :key="index" @click="goUserIndex(item)">
+          <Card :bordered="true" class="customCard item">
+            <div class="line">
+              <avatar :imgId="item.imgid"/>
+            </div>
+            <div class="line">{{item.username}}</div>
+          </Card>
         </div>
-        <Divider type="vertical" dashed />
       </div>
     </div>
   </div>
@@ -36,9 +37,11 @@ export default {
   created () {
     this.$store.commit("social/setLeftCurrent", 4)
     this.getFans()
+    this.$store.commit("switchLoading", !1)
   },
   methods: {
     goUserIndex (user) {
+      this.$store.commit("switchLoading", !0)
       this.$router.push({ path: "/otheruser/essaylist", query: { userId: user.id } })
     },
     getFans () {
@@ -49,7 +52,6 @@ export default {
         var fan_param = {
           userId: this.userInfo.id,
           success: (list) => {
-            console.log(list)
             this.fanList = list
           },
           fail: () => {
@@ -71,12 +73,12 @@ export default {
 }
 .fan .item{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right:10px;
-    margin-bottom: 10px;
-    width: 70px;
+    flex-wrap: wrap;
+    margin-right:20px;
+    margin-bottom: 20px;
+    width: 100px;
     flex-grow: 0;
     flex-shrink: 0;
+    text-align: center;
 }
 </style>

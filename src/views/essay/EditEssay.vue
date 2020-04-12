@@ -38,9 +38,9 @@ export default {
     }
   },
   created () {
-    this.$store.commit("switchLoading", !1)
     this.$store.commit("user/setLeftCurrent", 2)
     this.getEssay()
+    this.$store.commit("switchLoading", !1)
   },
   methods: {
     getEssay () {
@@ -52,11 +52,15 @@ export default {
           this.formEditEssay.title = essay.title
           this.formEditEssay.contentObj.txt = essay.msg
           this.formEditEssay.contentObj.html = essay.htmlmsg
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getEssayByEssayId", essay_param)
     },
     handleSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -78,10 +82,12 @@ export default {
             if (valid) {
               _this.$store.dispatch("essay/editEssay", essay_param)
             } else {
+              this.$store.commit("switchLoading", !1)
               _this.$Message.error('Fail!')
             }
           })
         } else {
+          this.$store.commit("switchLoading", !1)
           _this.$Message.error('标题需要在1-20位,内容在4000字左右')
         }
       }

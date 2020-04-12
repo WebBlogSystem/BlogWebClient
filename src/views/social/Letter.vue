@@ -6,21 +6,25 @@
     <div v-else :class="{ scrollFinish: isLetterFinish, userListWrap: !0 }">
       <Scroll :on-reach-bottom="!isLetterFinish ? bottomAddLetter : stopAddLetter" height="600">
         <div class="userList">
-          <div class="item" v-for="(item, index) in letterList" :key="index">
-              <div class="avatar mr10">
-                <!-- <div class="noRead" v-if="item.noRead > 0"><span>{{+item.noRead > 99 ? "99+ : item.noRead}}</span></div> -->
-                <div class="noRead" v-if="item.noRead > 0"><span>{{item.noRead > 99 ? "99+" : item.noRead}}</span></div>
-                <avatar :imgId="item.user.imgid"/>
-              </div>
-              <div class="briefContent">
-                <div class="line">
-                  <span class="mr10">{{item.user.username}}:</span>
-                  <span v-if="item.latestLetterMsg">({{item.latestLetterMsg.createtime}})</span>
-                  <Button type="dashed" class="ml10" @click="deleteLetter(item.letter.id)">删除私信</Button>
-                  <Button type="dashed" class="ml10" @click="showLetterMsgList(item.letter, item.user, index)">打开私信</Button>
+          <div v-for="(item, index) in letterList" :key="index">
+            <Card :bordered="true" class="customCard">
+              <div class="item">
+                <div class="avatar mr10">
+                  <!-- <div class="noRead" v-if="item.noRead > 0"><span>{{+item.noRead > 99 ? "99+ : item.noRead}}</span></div> -->
+                  <div class="noRead" v-if="item.noRead > 0"><span>{{item.noRead > 99 ? "99+" : item.noRead}}</span></div>
+                  <avatar class="mt10" :imgId="item.user.imgid"/>
                 </div>
-                <div class="content" v-if="item.latestLetterMsg">{{item.latestLetterMsg.msg}}</div>
+                <div class="briefContent">
+                  <div class="line">
+                    <span class="mr10">{{item.user.username}}:</span>
+                    <span v-if="item.latestLetterMsg">(最新消息时间:{{item.latestLetterMsg.createtime}})</span>
+                    <Button type="dashed" class="ml10" @click="deleteLetter(item.letter.id, index)">删除私信</Button>
+                    <Button type="dashed" class="ml10" @click="showLetterMsgList(item.letter, item.user, index)">打开私信</Button>
+                  </div>
+                  <div class="content" v-if="item.latestLetterMsg">{{item.latestLetterMsg.msg}}</div>
+                </div>
               </div>
+            </Card>
           </div>
           <Divider v-if="isLetterFinish" size="small" class="fs10" dashed>已经到底了</Divider>
         </div>
@@ -36,32 +40,28 @@
         <div class="letterListWrap">
           <div :class="{ scrollFinish: isLetterMsgFinish, letterList: !0 }">
             <Scroll :on-reach-top="!isLetterMsgFinish ? topAddLetterMsg : stopAddLetterMsg" height="600">
-              <div :class="{item: !0, leftLetter: userInfo.id === item.toUserId, rightLetter: userInfo.id === item.fromUserId}" :ref="'letterItem' + index" v-for="(item, index) in reversedLetterMsgList" :key="index">
-                <div class="left">
-                  <div class="avatar" v-if="userInfo.id === item.toUserId"><avatar :imgId="current_user.imgid" /></div>
-                  <div class="avatar" v-if="userInfo.id === item.fromUserId"><avatar :imgId="userInfo.imgid" /></div>
-                </div>
-                <div :class="{ right:!0, rightLetterMsg:userInfo.id === item.fromUserId }">
-                  <div class="top ml10 mr10">
-                    {{item.createtime}}
-                    <span v-if="userInfo.id === item.toUserId && item.flag === 1">
-                      <Icon type="ios-checkmark" size="30"/>
-                      已读
-                    </span>
-                    <Checkbox v-if="userInfo.id === item.toUserId && item.flag === 0" @on-change="flag => setLetterMsgFlag(flag, item, index)">未读</Checkbox>
+              <div :ref="'letterItem' + index" v-for="(item, index) in reversedLetterMsgList" :key="index">
+                <Card :bordered="true" class="customCard">
+                  <div :class="{ item: !0, leftLetter: userInfo.id === item.toUserId, rightLetter: userInfo.id === item.fromUserId }">
+                    <div class="left">
+                      <div class="avatar" v-if="userInfo.id === item.toUserId"><avatar :imgId="current_user.imgid" /></div>
+                      <div class="avatar" v-if="userInfo.id === item.fromUserId"><avatar :imgId="userInfo.imgid" /></div>
+                    </div>
+                    <div :class="{ right:!0, rightLetterMsg:userInfo.id === item.fromUserId }">
+                      <div class="top ml10 mr10">
+                        {{item.createtime}}
+                        <span v-if="userInfo.id === item.toUserId && item.flag === 1">
+                          <Icon type="ios-checkmark" size="30"/>
+                          已读
+                        </span>
+                        <Checkbox v-if="userInfo.id === item.toUserId && item.flag === 0" @on-change="flag => setLetterMsgFlag(flag, item, index)">未读</Checkbox>
+                      </div>
+                      <div class="bottom msg mr10 ml10">{{item.msg}}</div>
+                    </div>
                   </div>
-                  <div class="bottom msg mr10 ml10">{{item.msg}}</div>
-                </div>
+                </Card>
               </div>
             </Scroll>
-
-            <!-- <scroller :on-infinite="bottomAddLetter" height="70%">
-              <div :class="{item: !0, leftLetter: item.left, rightLetter: item.right}" v-for="(item, index) in letterList" :key="index">
-                <div class="avatar"><img src="@/assets/logo.png" width="30px" height="30px"></div>
-                <div class="msg mr10 ml10">{{item.msg}}</div>
-                <Checkbox v-model="item.isRead" :disabled="item.isRead">{{item.isRead? '已读': '未读'}}</Checkbox>
-              </div>
-            </scroller> -->
           </div>
         </div>
         <Form :model="formSend" label-colon>
@@ -117,6 +117,7 @@ export default {
   created () {
     this.$store.commit("social/setLeftCurrent", 5)
     this.getLetterList()
+    this.$store.commit("switchLoading", !1)
   },
   destroyed () {
     this.letterSocket.map(item => {
@@ -172,18 +173,13 @@ export default {
         })
       }
     },
-    deleteLetter (letterId) {
+    deleteLetter (letterId, letterIndex) {
+      this.$store.commit("switchLoading", !0)
       var _this = this
       var letter_param = {
         letterId,
         success: () => {
-          this.letterSocket.map(item => {
-            if (letterId === item.letterId) {
-              item.socket.close()
-            }
-          })
-          this.$Message.success("删除成功")
-          this.$router.go(0)
+          _this.$router.go(0)
         },
         fail: () => {
           _this.$router.push("/logincenter/login")
@@ -197,7 +193,6 @@ export default {
         letterId: this.current_letter.id,
         userId: this.userInfo.id,
         success: (nums) => {
-          console.log(nums)
           this.letterList[this.current_letter_index].noRead = nums
         },
         fail: () => {
@@ -207,7 +202,7 @@ export default {
       this.$store.dispatch("letter/getNoReadLetterMsgNums", noRead_param)
     },
     setLetterMsgFlag (flag, letterMsg, index) {
-      console.log(flag, index, letterMsg)
+      this.$store.commit("switchLoading", !0)
       var _this = this
       if (flag) {
         var letterMsg_param = {
@@ -215,6 +210,7 @@ export default {
           success: () => {
             // this.setLetterNoRead()
             _this.letterMsgList[this.letterMsgList.length - 1 - index].flag = 1
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -224,6 +220,7 @@ export default {
       }
     },
     resetData () {
+      this.$store.commit("switchLoading", !0)
       this.isLetterMsgFinish = !1
       this.isShowDrawer = !1
       this.letterMsgList = []
@@ -232,6 +229,7 @@ export default {
       this.current_letter = {}
       this.formSend.msg = ""
       this.socket.close()
+      this.$store.commit("switchLoading", !1)
     },
     letterOpen () {
     },
@@ -305,6 +303,7 @@ export default {
               this.isLetterMsgFinish = !0
             }
             this.letterMsgList = this.letterMsgList.concat(letterMsgList.list)
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -314,6 +313,7 @@ export default {
       }
     },
     showLetterMsgList (current_letter, current_user, current_letter_index) {
+      this.$store.commit("switchLoading", !0)
       this.current_letter = current_letter
       this.current_user = current_user
       this.current_letter_index = current_letter_index
@@ -326,17 +326,16 @@ export default {
       // this.$refs['letterItem' + (this.essayList.length - 1)][0].scrollIntoView()
     },
     bottomAddLetter () {
+      this.$store.commit("switchLoading", !0)
       return new Promise(resolve => {
         this.getLetterList()
         resolve()
       })
     },
     stopAddLetter () {
-      return new Promise(resolve => {
-        resolve()
-      })
     },
     topAddLetterMsg () {
+      this.$store.commit("switchLoading", !0)
       // 页面获取 page = (Math.floor(this.letterList/10))
       // 掉接口 (page + 1)
       // 接口但会数据 list
@@ -389,12 +388,22 @@ export default {
 .ml10{
   margin-left: 10px;
 }
+.mt10{
+  margin-top: 6px;
+}
+.customCard{
+  background: #DFE4ED;
+  margin-bottom: 10px;
+}
 #letter{
   width: 100%;
 }
 .userListWrap{
   width: 100%;
   position: relative;
+}
+.userListWrap .item{
+  display: flex;
 }
 .item .avatar{
   border: 1px solid #2d8cf0;
@@ -408,7 +417,7 @@ export default {
   align-items: center;
   border-bottom: 1px solid #e8eaec;
 }
-.userList>.item .noRead{
+.userList .item .noRead{
   position: absolute;
   top: -10px;
   right: -10px;
@@ -448,7 +457,6 @@ export default {
 .letterList .item{
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
 }
 .letterList .item.leftLetter{
   justify-content: flex-start;

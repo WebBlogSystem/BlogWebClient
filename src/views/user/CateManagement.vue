@@ -5,12 +5,22 @@
       <div v-if="cateList.length <= 0">
         当前没有分类,请添加分类
       </div>
-      <div v-else class="line" v-for="(cate, cateIndex) in cateList" :key="cateIndex">
-        <span class="catename">{{cate.name}}</span>
-        <div>
-          <Button class="btn" size="small" type="primary" @click="changeShow(1, cate)">添加博文</Button>
-          <Button class="btn" size="small"  type="primary" @click="changeShow(2, cate)">删除博文</Button>
-          <Button class="btn" size="small" type="primary" @click="deleteCate(cate, cateIndex)">删除标签</Button>
+      <div v-else class="tagsWrapper">
+        <div v-for="(cate, cateIndex) in cateList" :key="cateIndex" class="tagWrapper">
+          <Card style="width:200px" class="customCard">
+            <Tag slot="title" size="large" color="#2d8cf0" type="border">
+              {{cate.name}}
+            </Tag>
+            <Dropdown placement="right-start">
+              <Button type="dashed">标签操作</Button>
+              <DropdownMenu slot="list">
+                <DropdownItem @click.native="editCate(cate, cateIndex)">修改标签</DropdownItem>
+                <DropdownItem @click.native="changeShow(1, cate)">添加文章</DropdownItem>
+                <DropdownItem @click.native="changeShow(2, cate)">删除文章</DropdownItem>
+                <DropdownItem @click.native="deleteCate(cate, cateIndex)">删除标签</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </Card>
         </div>
       </div>
     </div>
@@ -37,8 +47,10 @@ export default {
     this.$store.commit("user/setLeftCurrent", 3)
     if (this.userInfo.id) {
       this.getCates()
+      this.$store.commit("switchLoading", !1)
+    } else {
+      this.$router.replace("/")
     }
-    this.$store.commit("switchLoading", !1)
   },
   data () {
     return {
@@ -46,7 +58,7 @@ export default {
       isShow: 0,
       essayPage: 0,
       essayList: [],
-      cate_name: "",
+      cateName: "",
       current_cate: {}
     }
   },
@@ -63,13 +75,14 @@ export default {
         success: (list) => {
           _this.cateList = _this.cateList.concat(list)
         },
-        fail: () => {
-          _this.$router.push("/logincenter/login")
+        fail: (info) => {
+          _this.$Message.error(info)
         }
       }
       _this.$store.dispatch("cate/getCates", cate_param)
     },
     changeShow (isShow, cate) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -85,6 +98,11 @@ export default {
             _this.essayList = this.essayList.concat(list)
             _this.current_cate = cate
             _this.isShow = isShow
+            _this.$store.commit("switchLoading", !1)
+          },
+          fail: (info) => {
+            _this.$Message.error(info)
+            _this.$store.commit("switchLoading", !1)
           }
         }
         if (isShow === 1) {
@@ -94,6 +112,7 @@ export default {
       }
     },
     addEssayCate (essayId, cateId, essayIndex) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -112,6 +131,7 @@ export default {
       }
     },
     deleteEssayCate (essayId, cateId, essayIndex) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -137,23 +157,25 @@ export default {
           render: (h) => {
             return h('Input', {
               props: {
-                value: this.cate_name,
+                value: this.cateName,
                 placeholder: '请输入标签名...'
               },
               on: {
                 input: (val) => {
-                  this.cate_name = val
+                  this.cateName = val
                 }
               }
             })
           },
           onOk: () => {
+            this.$store.commit("switchLoading", !0)
             var _this = this
             _this.$store.dispatch("cate/addCate", {
-              name: _this.cate_name,
+              name: _this.cateName,
               userId: _this.userInfo.id,
               success: (cate) => {
-                _this.$router.go(0)
+                _this.cateList.unshift(cate)
+                _this.$store.commit("switchLoading", !1)
               },
               fail: () => {
                 _this.$router.push("/logincenter/login")
@@ -161,17 +183,20 @@ export default {
             })
           },
           onCancel: () => {
-            this.cate_name = ""
+            this.cateName = ""
           }
         })
       }
     },
     initEssayData () {
+      this.$store.commit("switchLoading", !0)
       this.essayList = []
       this.isShow = 0
       this.current_cate = {}
+      this.$store.commit("switchLoading", !1)
     },
     deleteCate (cate, cateIndex) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -180,12 +205,55 @@ export default {
           cateId: cate.id,
           success: () => {
             _this.cateList.splice(cateIndex, 1)
+            _this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
           }
         }
         _this.$store.dispatch("cate/deleteCate", cate_param)
+      }
+    },
+    editCate (cate, cateIndex) {
+      if (!this.userInfo.id) {
+        this.$router.push("/logincenter/login")
+      } else {
+        var _this = this
+        _this.cateName = cate.name
+        _this.$Modal.confirm({
+          render: (h) => {
+            return h('Input', {
+              props: {
+                value: cate.name,
+                placeholder: '请输入新标签名...'
+              },
+              on: {
+                input: (val) => {
+                  _this.cateName = val
+                }
+              }
+            })
+          },
+          onOk: () => {
+            _this.$store.commit("switchLoading", !0)
+            if (_this.cateName !== cate.name) {
+              _this.$store.dispatch("cate/editCate", {
+                cateId: cate.id,
+                name: _this.cateName,
+                success: (cate) => {
+                  _this.cateList[cateIndex].name = cate.name
+                  _this.$store.commit("switchLoading", !1)
+                },
+                fail: () => {
+                  _this.$router.push("/logincenter/login")
+                }
+              })
+            }
+          },
+          onCancel: () => {
+            _this.cateName = ""
+          }
+        })
       }
     }
   }
@@ -196,6 +264,9 @@ export default {
   margin-left: 30px;
   display: flex;
   flex-direction: column;
+}
+.customCard{
+  background: #DFE4ED;
 }
 .cateManagement .line{
   display: flex;
@@ -226,5 +297,13 @@ export default {
 }
 .fs10{
   font-size: 10px;
+}
+.tagsWrapper{
+  display: flex;
+  flex-wrap: wrap;
+}
+.tagWrapper{
+  margin-left: 20px;
+  margin-top: 10px;
 }
 </style>

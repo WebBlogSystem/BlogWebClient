@@ -1,7 +1,7 @@
 <template>
 <div>
   <div id="social">
-    <Dropdown trigger="click" placement="top-start">
+    <Dropdown trigger="click" placement="top">
       <Button type="primary">
         <span>社交</span>
         <Icon type="ios-arrow-down"></Icon>

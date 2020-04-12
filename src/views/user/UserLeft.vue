@@ -1,5 +1,5 @@
 <template>
-    <Menu :active-name="leftCurrent+''" @on-select="onSelect">
+    <Menu :active-name="leftCurrent+''" @on-select="onSelect" class="customUser">
         <MenuGroup title="个人中心">
             <MenuItem name="1">
                 <Icon type="md-chatbubbles" />
@@ -31,6 +31,7 @@ export default {
   },
   methods: {
     onSelect (current) {
+      this.$store.commit("switchLoading", !0)
       let path = ''
       switch (current) {
         case '2':
@@ -56,3 +57,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.customUser{
+  background-color: transparent;
+}
+</style>

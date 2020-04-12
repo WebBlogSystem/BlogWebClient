@@ -160,6 +160,7 @@ export default {
       this.$Notice.error({ title: '头像上传超过最大尺寸1MB' })
     },
     editSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -186,6 +187,7 @@ export default {
               })
               _this.$Message.success('Success!')
             } else {
+              this.$store.commit("switchLoading", !1)
               _this.$Message.error('Fail!')
             }
           })
@@ -196,6 +198,7 @@ export default {
       this.$refs[name].resetFields()
     },
     setPwdSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -214,6 +217,7 @@ export default {
               }
             })
           } else {
+            this.$store.commit("switchLoading", !1)
             this.$Message.error('Fail!')
           }
         })

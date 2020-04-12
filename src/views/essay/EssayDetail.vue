@@ -8,8 +8,8 @@
       <span>作者:</span>
       <span class="ml10">{{user.username}}</span>
     </div>
-    <div>
-    <span class="mr10">标签:</span><Tag color="#57a3f3" class="mr10" v-for="(cate, index) in cateListOfEssay" :key="index" type="border">{{cate.name}}</Tag>
+    <div class="tagsWrapper">
+    <span class="mr10 spanTag">标签:</span><Tag color="#57a3f3" class="mr10" v-for="(cate, index) in cateListOfEssay" :key="index" type="border">{{cate.name}}</Tag>
     </div>
     <div v-if="content.html">
       <editor v-model="content"></editor>
@@ -67,13 +67,17 @@ export default {
   },
   created () {
     var essayId = parseInt(this.$route.query.essayId)
-    this.getEssayDetail(essayId)
-    this.getCatesByEssay(essayId)
     var userId = parseInt(this.$route.query.userId)
-    this.getUser(userId)
-    this.getUps(essayId)
-    if (this.userInfo.id) {
-      this.getUpOrDown(essayId, this.userInfo.id)
+    if (userId && essayId) {
+      this.getEssayDetail(essayId, userId)
+      this.getCatesByEssay(essayId)
+      this.getUser(userId)
+      this.getUps(essayId)
+      if (this.userInfo.id) {
+        this.getUpOrDown(essayId, this.userInfo.id)
+      }
+    } else {
+      this.$router.replace("/")
     }
     this.$store.commit("switchLoading", !1)
   },
@@ -102,18 +106,51 @@ export default {
         essayId,
         success: (up) => {
           this.up = up
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getUps", up_param)
     },
-    getEssayDetail (essayId) {
+    getEssayDetail (essayId, userId) {
+      var _this = this
       var essay_params = {
         essayId,
         success: (res) => {
-          this.essay = res
-          this.content.txt = this.essay.msg
-          this.content.html = this.essay.htmlmsg
-          this.getCommentsByEssayId(this.commentPage)
+          if (res.userId === userId) {
+            if (res.flag !== 1) {
+              if (_this.userInfo.id) {
+                if (_this.userInfo.id !== res.userId) {
+                  this.$Notice.error({
+                    title: "路由信息异常",
+                    desc: "请不要随便看别人未审核通过的文章哦",
+                    onClose: () => {
+                      _this.$router.replace("/")
+                    }
+                  })
+                }
+              } else {
+                this.$Notice.error({
+                  title: "登录异常",
+                  desc: "请先登录",
+                  onClose: () => {
+                    _this.$router.replace("/logincenter/login")
+                  }
+                })
+              }
+            }
+            this.essay = res
+            this.content.txt = this.essay.msg
+            this.content.html = this.essay.htmlmsg
+            this.getCommentsByEssayId(this.commentPage)
+          } else {
+            this.$Message.error("当前路由匹配有误,即将跳转首页")
+            this.$router.replace("/")
+          }
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getEssayByEssayId", essay_params)
@@ -127,6 +164,9 @@ export default {
           this.commentPage = pageMsg.currentPage
           this.commentList = pageMsg.list
           this.commentTotalPage = pageMsg.totalPage
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("comment/getCommentsByEssayId", comments_param)
@@ -136,6 +176,9 @@ export default {
         userId,
         success: (res) => {
           this.user = res
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("user/getUserByUserId", user_params)
@@ -145,6 +188,9 @@ export default {
         essayId,
         success: (list) => {
           this.cateListOfEssay = this.cateListOfEssay.concat(list)
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("cate/getCatesByEssay", cate_params)
@@ -230,5 +276,12 @@ export default {
 }
 .mb10{
   margin-bottom: 10px;
+}
+.tagsWrapper .spanTag{
+  display: inline-block;
+}
+.tagsWrapper{
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

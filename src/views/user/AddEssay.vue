@@ -27,9 +27,11 @@ export default {
   created () {
     if (this.userInfo.id) {
       this.getCates()
+      this.$store.commit("user/setLeftCurrent", 1)
+      this.$store.commit("switchLoading", !1)
+    } else {
+      this.$router.replace("/")
     }
-    this.$store.commit("user/setLeftCurrent", 1)
-    this.$store.commit("switchLoading", !1)
   },
   data () {
     return {
@@ -61,11 +63,15 @@ export default {
         userId: this.userInfo.id,
         success: (list) => {
           this.cates = list
+        },
+        fail: (info) => {
+          this.$Message.error(info)
         }
       }
       this.$store.dispatch("cate/getCates", cate_param)
     },
     handleSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -89,10 +95,12 @@ export default {
             if (valid) {
               this.$store.dispatch("essay/addEssay", essay_param)
             } else {
+              this.$store.commit("switchLoading", !1)
               this.$Message.error('标题需要在1-20位,内容在4000字左右')
             }
           })
         } else {
+          this.$store.commit("switchLoading", !1)
           this.$Message.error('标题需要在1-20位,内容在4000字左右')
         }
       }

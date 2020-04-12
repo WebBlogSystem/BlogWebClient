@@ -6,7 +6,8 @@ export default {
       flag: param.flag,
       userId: param.userId,
       cateId: param.cateId,
-      search: param.search
+      search: param.search,
+      selectWay: param.selectWay
     })
   },
   getEssay (param) {

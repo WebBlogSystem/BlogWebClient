@@ -19,7 +19,7 @@ const actions = {
         data = data.res
         param.success(data)
       } else {
-        ViewUI.Message.error(data.info)
+        param.fail(data.info)
       }
     })
   },

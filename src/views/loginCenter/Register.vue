@@ -32,6 +32,9 @@
 </template>
 <script>
 export default {
+  created () {
+    this.$store.commit("switchLoading", !1)
+  },
   data () {
     return {
       formValidate: {
@@ -44,7 +47,7 @@ export default {
       ruleValidate: {
         username: [
           { required: true, message: '请输入昵称', trigger: 'blur' },
-          { type: 'string', pattern: /^.{5,15}$/, message: '用户名长度需在5-15位', trigger: 'blur'}
+          { type: 'string', pattern: /^.{5,15}$/, message: '用户名长度需在5-15位', trigger: 'blur' }
         ],
         mail: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
@@ -66,6 +69,7 @@ export default {
   },
   methods: {
     handleSubmit (name) {
+      this.$store.commit("switchLoading", !0)
       this.$refs[name].validate((valid) => {
         if (valid) {
           var user_param = {
@@ -75,7 +79,12 @@ export default {
             sex: this.formValidate.sex,
             intro: this.formValidate.intro,
             success: () => {
+              this.$store.commit("switchLoading", !1)
               this.$Message.success("请登录邮箱激活使用")
+            },
+            fail: (info) => {
+              this.$store.commit("switchLoading", !1)
+              this.$Message.error(info)
             }
           }
           this.$store.dispatch("user/register", user_param)

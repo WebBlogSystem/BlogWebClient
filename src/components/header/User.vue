@@ -84,6 +84,7 @@ export default {
       }
     },
     goUser (current) {
+      this.$store.commit("switchLoading", !0)
       let path = ''
       switch (current) {
         case '4':

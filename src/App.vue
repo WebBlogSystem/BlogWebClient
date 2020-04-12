@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="AppHome">
     <!-- <avatar :imgId="22"/> -->
     <div id="loading" v-if="loading">
       <loading></loading>
@@ -70,5 +70,13 @@ export default {
 }
 .fc{
   color: #57a3f3;
+}
+html{
+  height: 100%;
+}
+body{
+  background-image: url("./assets/blue-snow.png");
+  height: 100%;
+  background-attachment: fixed;
 }
 </style>

@@ -27,5 +27,16 @@ export default {
     return axios.post("/user/deleteCatesByCateId", {
       cateId: param.cateId
     })
+  },
+  getCateByCateId (param) {
+    return axios.post("/user/getCateByCateId", {
+      cateId: param.cateId
+    })
+  },
+  editCate (param) {
+    return axios.post("/user/editCate", {
+      id: param.cateId,
+      name: param.name
+    })
   }
 }
