@@ -2,7 +2,7 @@
   <div class="comment">
     <div class="commentList">
       <div v-if="commentList.length <= 0">
-        您当前没有评论过文章
+        <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
       <div v-else>
         <Scroll :on-reach-bottom="!isCommentFinish ? bottomAddComment : stopAddComment" height="600">
@@ -128,7 +128,6 @@ export default {
       }
     },
     bottomAddComment () {
-      this.$store.commit("switchLoading", !0)
       return new Promise(resolve => {
         this.getCommentsByUserId()
         resolve()

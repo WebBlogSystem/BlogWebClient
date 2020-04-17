@@ -2,7 +2,6 @@
   <div id="user">
     <Dropdown trigger="click">
       <Button type="primary">
-          <span class="mr5 ml5">{{userInfo.username}}</span>
           <span>个人中心</span>
           <Icon type="ios-arrow-down"></Icon>
       </Button>
@@ -71,7 +70,7 @@ export default {
     getMessage (msg) {
       var _this = this
       var loginCheck = JSON.parse(msg.data)
-      if (!loginCheck.islogin) {
+      if (!loginCheck.isLogin) {
         this.$Notice.warning({
           title: "登录异常",
           desc: loginCheck.info,

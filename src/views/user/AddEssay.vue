@@ -84,7 +84,7 @@ export default {
             title: this.formAddEssay.title,
             msg: this.formAddEssay.contentObj.txt,
             htmlMsg: this.formAddEssay.contentObj.html,
-            success: (user) => {
+            success: () => {
               this.$router.replace("/user/blogmanagement")
             },
             fail: () => {

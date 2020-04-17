@@ -2,7 +2,7 @@
   <div class="fan">
     <div class="fanList">
       <div v-if="fanList.length <= 0">
-        没有粉丝
+        <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
       <div v-else>
         <div v-for="(item, index) in fanList" :key="index" @click="goUserIndex(item)">
@@ -76,7 +76,6 @@ export default {
     flex-wrap: wrap;
     margin-right:20px;
     margin-bottom: 20px;
-    width: 100px;
     flex-grow: 0;
     flex-shrink: 0;
     text-align: center;

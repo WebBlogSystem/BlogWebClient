@@ -216,15 +216,16 @@ export default {
             })
           },
           onOk: () => {
+            this.$store.commit("switchLoading", !0)
             if (_this.msg.length > 0 && _this.msg.length <= 50) {
               var comment_param = {
                 msg: _this.msg,
                 userId: _this.userInfo.id,
                 essayId,
-                success: (comment) => {
-                  _this.$store.commit("user/setUserInfo", comment.user)
+                success: () => {
                   _this.msg = ""
                   _this.getCommentsByEssayId(1)
+                  this.$store.commit("switchLoading", !1)
                 },
                 fail: () => {
                   _this.$router.push("/logincenter/login")
@@ -232,6 +233,7 @@ export default {
               }
               _this.$store.dispatch("comment/addComments", comment_param)
             } else {
+              this.$store.commit("switchLoading", !1)
               _this.$Message.error("信息长度在1-50位")
             }
           }
@@ -239,6 +241,7 @@ export default {
       }
     },
     updateUp (essayId, flag) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -250,6 +253,7 @@ export default {
           success: (up) => {
             _this.upOrDown = flag
             _this.up = up
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")

@@ -2,7 +2,7 @@
   <div id="logo">
     <div class="logoWrap">
       <img alt="logo" src="@/assets/logo.png" width="20px" height="20px"/>
-      <div class="username">MyBlog</div>
+      <div class="username">MiniBlog</div>
     </div>
   </div>
 </template>

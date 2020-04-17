@@ -16,10 +16,10 @@ export default {
 </script>
 <style scoped>
   .socialServeWrap{
+    height: 100%;
     display: flex;
   }
   .socialServeWrap .left{
-    min-width: 240px;
     flex-grow: 0;
     flex-shrink: 1;
   }

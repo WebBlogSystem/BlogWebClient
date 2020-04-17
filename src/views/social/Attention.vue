@@ -1,8 +1,8 @@
 <template>
   <div class="attention">
-    <div class="attentionList">
+    <div class="attentionList">{{attentionList.lengt}}
       <div v-if="attentionList.length <= 0">
-        当前没有关注
+        <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
       <div v-else v-for="(item, index) in attentionList" :key="index">
         <Card :bordered="true" class="customCard item">
@@ -65,6 +65,7 @@ export default {
       }
     },
     deleteAttention (userId, index) {
+      this.$store.commit("switchLoading", !0)
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
@@ -73,6 +74,7 @@ export default {
           toUserId: userId,
           success: () => {
             this.attentionList.splice(index, 1)
+            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             this.$router.push("/logincenter/login")
@@ -96,7 +98,6 @@ export default {
     flex-wrap: wrap;
     margin-right:20px;
     margin-bottom: 20px;
-    width: 100px;
     flex-grow: 0;
     flex-shrink: 0;
     text-align: center;

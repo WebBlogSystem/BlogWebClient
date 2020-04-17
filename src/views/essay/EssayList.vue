@@ -8,7 +8,7 @@
         </div>
     </div>
     <div v-if="essayList.length <= 0" class="essayListShow">
-      当前没有文章显示
+      <img :src="require('@/static/No.jpg')" height="100%" width="100%">
     </div>
     <div v-else :class="{ essayListWrapper: !0, scrollFinish: isFinish, essayListShow: !0 }">
       <Scroll ref="scroll" :on-reach-bottom="!isFinish ? handleAddEssay : stopAddEssay" height="628">
@@ -225,7 +225,7 @@ export default {
       })
     },
     deleteEssay (essayIndex) {
-      this.$Message.success("删除成功")
+      this.$store.commit("switchLoading", !0)
       var _this = this
       var fromPage = Math.floor(essayIndex / 10) + 1
       this.essayList.length = (fromPage - 1) * 10
@@ -257,6 +257,7 @@ export default {
           _this.isFinish = item.length < 10
         })
         _this.$store.commit("switchLoading", !1)
+        this.$Message.success("删除成功")
       })
     },
     getNewEssayList () {
@@ -265,7 +266,6 @@ export default {
       this.getEssayByPage()
     },
     getHotEssayList () {
-      console.log("jskdfjkasjdfkjlakj")
       this.selectWay = 1
       this.page = 0
       this.getEssayByPage()

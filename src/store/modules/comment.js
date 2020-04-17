@@ -43,8 +43,7 @@ const actions = {
       var data = response.data
       if (data.islogin) {
         if (data.flag) {
-          data = data.res
-          param.success(data)
+          param.success()
         } else {
           ViewUI.Message.error(data.info)
         }

@@ -8,7 +8,7 @@
         <FormItem :label-width = "70" label="博文内容">
         </FormItem>
         <editor v-model="formEditEssay.contentObj"></editor>
-        <FormItem>
+        <FormItem class="submitWrapper">
             <Button type="primary" @click="handleSubmit('formEditEssay')">提交博文</Button>
         </FormItem>
     </Form>
@@ -103,3 +103,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+.submitWrapper{
+  text-align:center;
+  margin-top:20px;
+}
+</style>

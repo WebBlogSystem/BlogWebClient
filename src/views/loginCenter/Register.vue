@@ -88,7 +88,6 @@ export default {
             }
           }
           this.$store.dispatch("user/register", user_param)
-          this.$Message.success('Success!')
         } else {
           this.$Message.error('Fail!')
         }

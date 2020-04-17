@@ -1,37 +1,45 @@
 <template>
     <div class="userInfo">
         <!-- 用户个人资料展示 -->
-        <div class="userInfoWrap" v-if="type == 1">
-            <div class="left">
-                <div class="line avatar">
-                  <!-- todo -->
-                    <avatar :imgId="userInfo.imgid" />
-                </div>
-                <div class="line">
-                    <span>昵称:</span>
-                    <span>{{userInfo.username}}</span>
-                </div>
-                <div class="line">
-                    <span>性别:</span>
-                    <span>{{userInfo.sex == 1 ? "男":"女"}}</span>
-                </div>
-                <div class="line">
-                    <span>活跃值:</span>
-                    <span>{{userInfo.point}}</span>
-                </div>
-                <div class="line">
-                    <span>邮箱:</span>
-                    <span>{{userInfo.mail}}</span>
-                </div>
-                <div class="line">
-                    <span>个性签名:</span>
-                    <span class="userInfoFormat">{{userInfo.intro}}</span>
-                </div>
-                <div class="right">
-                  <Button type="primary" class="btn" @click="type = 2">修改个人资料</Button>
-                  <Button type="primary" @click="type = 3" class="setPwdBtn">修改密码</Button>
-                </div>
+        <div class="userInfoWrap mt20 mb20" v-if="type == 1">
+          <Card style="width:450px" class="customCard">
+            <p slot="title" class="customP">
+              <avatar :imgId="userInfo.imgid" />
+              <span>{{userInfo.username}}</span>
+            </p>
+            <a href="#" slot="extra">
+              <Dropdown style="margin-left: 20px">
+                <a href="javascript:void(0)">
+                    资料操作
+                    <Icon type="ios-arrow-down"></Icon>
+                </a>
+                <DropdownMenu slot="list">
+                    <DropdownItem @click.native="type = 2">修改个人资料</DropdownItem>
+                    <DropdownItem @click.native="type = 3">修改密码</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </a>
+            <div class="line">
+                <span>昵称:</span>
+                <span>{{userInfo.username}}</span>
             </div>
+            <div class="line">
+                <span>性别:</span>
+                <span>{{userInfo.sex == 1 ? "男":"女"}}</span>
+            </div>
+            <div class="line">
+                <span>活跃值:</span>
+                <span>{{userInfo.point}}</span>
+            </div>
+            <div class="line">
+                <span>邮箱:</span>
+                <span>{{userInfo.mail}}</span>
+            </div>
+            <div class="line">
+                <span>个性签名:</span>
+                <span class="userInfoFormat">{{userInfo.intro}}</span>
+            </div>
+          </Card>
         </div>
         <!-- 修改用户信息 -->
         <div class="editInfo" v-if="type == 2">
@@ -84,9 +92,9 @@
                         <Icon type="ios-lock-outline" slot="prepend"></Icon>
                     </i-input>
                 </FormItem>
-                <FormItem>
-                    <Button type="primary" @click="setPwdSubmit('formSetPwd')">修改</Button>
-                    <Button @click="setPwdReset('formSetPwd')" style="margin-left: 8px">重置</Button>
+                <FormItem class="btnWrapper">
+                    <Button class="editBtn mr20 ml20" type="primary" @click="setPwdSubmit('formSetPwd')">修改</Button>
+                    <Button class="subBtn mr20 ml20" @click="setPwdReset('formSetPwd')" style="margin-left: 8px">重置</Button>
                 </FormItem>
             </Form>
         </div>
@@ -165,8 +173,9 @@ export default {
         this.$router.push("/logincenter/login")
       } else {
         var username = this.formEdit.username.replace(/(^\s*)|(\s*$)/g, "")
-        if (username.length < 5 || username.length > 20) {
-          this.$Message.error("用户名长度在5-20位")
+        if (username.length < 5 || username.length > 15) {
+          this.$Message.error("用户名长度在5-15位")
+          this.$store.commit("switchLoading", !1)
         } else {
           var _this = this
           _this.$refs[name].validate((valid) => {
@@ -297,5 +306,30 @@ export default {
   width: 298px;
   height: 16px;
   text-overflow: ellipsis;
+}
+p{
+  display: inline-block;
+}
+.customP{
+  height: auto !important;
+  text-align: center;
+}
+.btnWrapper{
+  text-align: center;
+}
+.mr20{
+  margin-right: 20px;
+}
+.ml20{
+  margin-left: 20px;
+}
+.mt20{
+  margin-top: 20px;
+}
+.mb20{
+  margin-bottom: 20px;
+}
+.customCard{
+  background: #DFE4ED;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div id="letter">
     <div v-if="letterList.length <= 0">
-      当前没有私信用户
+      <img :src="require('@/static/No.jpg')" height="100%" width="100%">
     </div>
     <div v-else :class="{ scrollFinish: isLetterFinish, userListWrap: !0 }">
       <Scroll :on-reach-bottom="!isLetterFinish ? bottomAddLetter : stopAddLetter" height="600">
@@ -326,7 +326,6 @@ export default {
       // this.$refs['letterItem' + (this.essayList.length - 1)][0].scrollIntoView()
     },
     bottomAddLetter () {
-      this.$store.commit("switchLoading", !0)
       return new Promise(resolve => {
         this.getLetterList()
         resolve()
@@ -335,7 +334,6 @@ export default {
     stopAddLetter () {
     },
     topAddLetterMsg () {
-      this.$store.commit("switchLoading", !0)
       // 页面获取 page = (Math.floor(this.letterList/10))
       // 掉接口 (page + 1)
       // 接口但会数据 list

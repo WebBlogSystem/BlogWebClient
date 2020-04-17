@@ -6,7 +6,7 @@
           <TabPane label="回复我的"></TabPane>
         </Tabs>
         <div v-if="replyList.length <= 0">
-          当前没有回复信息
+          <img :src="require('@/static/No.jpg')" height="100%" width="100%">
         </div>
         <div v-else>
           <Scroll :on-reach-bottom="!isReplyFinish ? bottomAddReply : stopAddReply" height="600">
@@ -88,7 +88,6 @@ export default {
             } else {
               this.replyList = this.replyList.concat(list)
             }
-            this.$store.commit("switchLoading", !1)
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
@@ -98,7 +97,6 @@ export default {
       }
     },
     bottomAddReply () {
-      this.$store.commit("switchLoading", !0)
       return new Promise(resolve => {
         this.getReplyByUserId()
         resolve()
@@ -153,8 +151,10 @@ export default {
       }
     },
     getCommentFromOrToMe (name) {
-      this.page = 0
+      this.replyPage = 0
       this.flag = +name
+      this.isReplyFinish = 0
+      this.replyList = []
       this.getReplyByUserId()
     }
   },

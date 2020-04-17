@@ -18,6 +18,7 @@ export default {
   },
   methods: {
     searchEssay () {
+      this.$store.commit("switchLoading", !0)
       this.$router.push({ path: "/", query: { search: this.txt } })
     }
   }

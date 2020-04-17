@@ -10,20 +10,25 @@
       <div class="line btnWrap" v-if="user.id !== userInfo.id">
         <Button type="info" class="btn" @click="addAttention(user.id)" v-if="!type">关注</Button>
         <Button type="info" class="btn" @click="deleteAttention(user.id)" v-if="type">取消关注</Button>
-        <Button type="info" @click="addLetter(user.id)" v-if="!letterType">私信他</Button>
+        <Button type="info" @click="addLetter(user.id)" v-if="!letterType">私信</Button>
       </div>
     </div>
     <div class="leftBottom">
-      <Menu :active-name="cateId" :open-names="['4']" class="customMenu">
+      <!-- <Menu :active-name="cateId" class="customMenu">
+        <MenuGroup title="全部标签">
+          <MenuItem v-for="(cate, index) in cateList" :key="index" :name="cate.id" @click.native="goCateEssayList(cate.id)">
+            {{cate.id}}{{cate.name}}
+          </MenuItem>
+        </MenuGroup>
+      </Menu> -->
+      <Menu ref="menus" :active-name="currentCate" :open-names="['4']" class="customMenu">
           <Submenu name="4">
               <template slot="title">
                   <Icon type="ios-cog" />
                   全部标签
               </template>
-              <MenuItem v-for="(cate,index) in cateList" :key="index" :name="cate.id">
-                <div @click="goCateEssayList(cate.id)">
-                  {{cate.name}}
-                </div>
+              <MenuItem v-for="(cate,index) in cateList" :key="index" :name="'4-'+cate.id" @click.native="goCateEssayList(cate.id)">
+                {{cate.name}}
               </MenuItem>
           </Submenu>
       </Menu>
@@ -45,7 +50,7 @@ export default {
       user: {},
       type: 0,
       cateList: [],
-      cateId: 0,
+      currentCate: '4-' + (this.$route.query.cateId ? (+this.$route.query.cateId) : 0),
       // 0表示未建立私信, 1 表示已建立私信
       letterType: 0
     }
@@ -58,24 +63,17 @@ export default {
       this.user = {}
       this.type = 0
       this.cateList = []
-      this.cateId = 0
+      this.currentCate = '4-' + (this.$route.query.cateId ? (+this.$route.query.cateId) : 0)
       this.letterType = 0
       this.initData()
     }
   },
   methods: {
     initData () {
-      var userId = parseInt(this.$route.query.userId)
+      var userId = +(this.$route.query.userId)
       if (userId) {
-        if (this.$route.query.cateId) {
-          this.cateId = parseInt(this.$route.query.cateId)
-        }
         this.getUser(userId)
         this.getCates(userId)
-        if (this.userInfo.id) {
-          this.getLetter(userId)
-          this.getAttention(userId)
-        }
       } else {
         this.$router.replace("/")
       }
@@ -141,8 +139,10 @@ export default {
       }
     },
     goCateEssayList (cateId) {
-      this.$store.commit("switchLoading", !0)
-      this.$router.replace({ path: "/otheruser/essaylist", query: { userId: this.user.id, cateId } })
+      if (('4-' + cateId) !== this.currentCate) {
+        this.$store.commit("switchLoading", !0)
+        this.$router.replace({ path: "/otheruser/essaylist", query: { userId: this.user.id, cateId } })
+      }
     },
     getUser (userId) {
       var _this = this
@@ -151,7 +151,8 @@ export default {
         success: (res) => {
           _this.user = res
           if (_this.userInfo.id) {
-            _this.getAttention(this.user.id)
+            _this.getAttention(_this.user.id)
+            _this.getLetter(userId)
           }
         },
         fail: (info) => {
@@ -243,5 +244,7 @@ export default {
 }
 .customMenu{
   background-color: transparent;
+  margin-top: 20px;
+  margin-right: 32px;
 }
 </style>

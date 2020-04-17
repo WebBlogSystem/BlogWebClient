@@ -3,7 +3,7 @@
     <Button class="btn" type="dashed" @click="addCate">添加分类</Button>
     <div class="lineWrap">
       <div v-if="cateList.length <= 0">
-        当前没有分类,请添加分类
+        <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
       <div v-else class="tagsWrapper">
         <div v-for="(cate, cateIndex) in cateList" :key="cateIndex" class="tagWrapper">
@@ -27,14 +27,16 @@
     <div v-if="isShow">
       <Drawer width="26" :title="isShow === 1?'添加博文('+current_cate.name+')':'删除博文('+current_cate.name+')'" :closable="true" :scrollable="true" :value="!!isShow" @on-close="initEssayData">
         <div class="lineWrap" v-for="(essay,essayIndex) in essayList" :key="essayIndex">
-          <div class="essayInfo">
-            <div class="title mgr20">{{essay.title}}</div>
-            <div class="date mgr20">时间:{{essay.createtime}}</div>
-          </div>
-          <div class="btn">
-            <Button class="btn" size="small" type="primary" v-if="isShow == 1" @click="addEssayCate(essay.id, current_cate.id, essayIndex)">添加</Button>
-            <Button class="btn" size="small" type="primary" v-if="isShow == 2" @click="deleteEssayCate(essay.id, current_cate.id, essayIndex)">删除</Button>
-          </div>
+          <Card style="width:100%" class="customCard">
+            <div class="essayInfo">
+              <div class="title mgr20">{{essay.title}}</div>
+              <div class="date mgr20">时间:{{essay.createtime}}</div>
+            </div>
+            <div class="btn">
+              <Button class="btn" size="small" type="primary" v-if="isShow == 1" @click="addEssayCate(essay.id, current_cate.id, essayIndex)">添加</Button>
+              <Button class="btn" size="small" type="primary" v-if="isShow == 2" @click="deleteEssayCate(essay.id, current_cate.id, essayIndex)">删除</Button>
+            </div>
+          </Card>
         </div>
       </Drawer>
     </div>

@@ -50,6 +50,7 @@ export default {
               this.$router.push("/")
             },
             fail: (info) => {
+              this.$store.commit("switchLoading", !1)
               this.$Message.error(info)
             }
           })
