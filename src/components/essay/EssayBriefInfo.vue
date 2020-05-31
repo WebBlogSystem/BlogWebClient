@@ -6,10 +6,10 @@
           {{essay.title}}
         </div>
         <div class="date mgr20">
-          {{essay.createtime}}
+          <Icon type="md-time" />{{essay.createtime}}
         </div>
         <div class="goodnum mgr20">
-          点赞数:{{up.up}}
+          <Icon type="md-thumbs-up" />({{up.up}})
         </div>
         <div class="checkStatus" v-if="essayListFrom === 1">
           <div v-if="essay.flag == 0">审核中</div>
@@ -148,7 +148,7 @@ export default {
   text-overflow: ellipsis;
 }
 .date{
-  width: 146px;
+  width: 186px;
 }
 .goodnum{
   width: 96px;

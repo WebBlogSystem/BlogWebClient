@@ -7,7 +7,7 @@
         </FormItem>
         <FormItem :label-width = "70" label="博文标签">
             <Select v-model="formAddEssay.cate" multiple style="width:296px">
-                <Option v-for="item in cates" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                <Option v-for="item in cates" :value="item.cate.id" :key="item.cate.id">{{ item.cate.name }}</Option>
             </Select>
             <i-input v-model="formAddEssay.newCate" placeholder="新增博文标签" :maxlength="20" class="input"/>
         </FormItem>
@@ -61,6 +61,7 @@ export default {
     getCates () {
       var cate_param = {
         userId: this.userInfo.id,
+        flag: 1,
         success: (list) => {
           this.cates = list
         },
@@ -84,11 +85,16 @@ export default {
             title: this.formAddEssay.title,
             msg: this.formAddEssay.contentObj.txt,
             htmlMsg: this.formAddEssay.contentObj.html,
-            success: () => {
+            success: (info) => {
+              this.$Message.success(info)
               this.$router.replace("/user/blogmanagement")
             },
             fail: () => {
               _this.$router.push("/logincenter/login")
+            },
+            actionError: (info) => {
+              _this.$store.commit("switchLoading", !1)
+              _this.$Message.error(info)
             }
           }
           this.$refs[name].validate((valid) => {

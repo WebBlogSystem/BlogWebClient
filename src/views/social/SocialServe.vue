@@ -4,6 +4,9 @@
         <div class="right">
           <router-view></router-view>
         </div>
+        <div class="date">
+          <vc-calendar :min-date="new Date()" :max-date="new Date()" :attributes='attrs' title-position="left" nav-visibility="hidden"></vc-calendar>
+        </div>
     </div>
 </template>
 <script>
@@ -11,6 +14,20 @@ import socialLeft from './SocialLeft'
 export default {
   components: {
     socialLeft
+  },
+  data () {
+    return {
+      attrs: [
+        {
+          key: 'today',
+          dates: new Date(),
+          dot: 'teal',
+          popover: {
+            label: '美好的一天！要开心呦！'
+          }
+        }
+      ]
+    }
   }
 }
 </script>
@@ -20,11 +37,15 @@ export default {
     display: flex;
   }
   .socialServeWrap .left{
-    flex-grow: 0;
-    flex-shrink: 1;
+    position: fixed;
   }
   .socialServeWrap .right{
     width: 75%;
-    padding: 20px;
+    margin-left:162px;
+  }
+  .date{
+    position: fixed;
+    right: 50px;
+    top: 80px;
   }
 </style>

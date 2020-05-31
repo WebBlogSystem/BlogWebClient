@@ -4,7 +4,6 @@
       <img :src="require('@/static/No.jpg')" height="100%" width="100%">
     </div>
     <div v-else :class="{ scrollFinish: isLetterFinish, userListWrap: !0 }">
-      <Scroll :on-reach-bottom="!isLetterFinish ? bottomAddLetter : stopAddLetter" height="600">
         <div class="userList">
           <div v-for="(item, index) in letterList" :key="index">
             <Card :bordered="true" class="customCard">
@@ -26,9 +25,7 @@
               </div>
             </Card>
           </div>
-          <Divider v-if="isLetterFinish" size="small" class="fs10" dashed>已经到底了</Divider>
         </div>
-      </Scroll>
     </div>
     <div class="drawer-letter" v-if="isShowDrawer">
       <Drawer
@@ -40,7 +37,7 @@
         <div class="letterListWrap">
           <div :class="{ scrollFinish: isLetterMsgFinish, letterList: !0 }">
             <Scroll :on-reach-top="!isLetterMsgFinish ? topAddLetterMsg : stopAddLetterMsg" height="600">
-              <div :ref="'letterItem' + index" v-for="(item, index) in reversedLetterMsgList" :key="index">
+              <div :ref="'letterItem' + index" v-for="(item, index) in reversedLetterMsgList" :key="index" :class="{ customConversition: !0,  leftLetterMsg: userInfo.id === item.toUserId, rightLetterMsg: userInfo.id === item.fromUserId }">
                 <Card :bordered="true" class="customCard">
                   <div :class="{ item: !0, leftLetter: userInfo.id === item.toUserId, rightLetter: userInfo.id === item.fromUserId }">
                     <div class="left">
@@ -183,6 +180,10 @@ export default {
         },
         fail: () => {
           _this.$router.push("/logincenter/login")
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("letter/deleteLetter", letter_param)
@@ -197,6 +198,10 @@ export default {
         },
         fail: () => {
           _this.$router.push("/logincenter/login")
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("letter/getNoReadLetterMsgNums", noRead_param)
@@ -214,6 +219,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("letterMsg/switchFlag", letterMsg_param)
@@ -256,15 +265,14 @@ export default {
         var _this = this
         var letter_param = {
           userId: this.userInfo.id,
-          page: ++this.letterPage,
-          success: (letter) => {
+          success: (letterList) => {
             if (typeof (WebSocket) === "undefined") {
               this.$Notice.info({
                 title: "浏览器版本过低",
                 desc: "当前浏览器不支持WebSocket,请更换支持WebSocket的浏览器"
               })
             } else {
-              letter.list.map(item => {
+              letterList.map(item => {
               // 实例化socket
                 var letterPath = process.env.VUE_APP_WS + "/getLetterMsgNums?letterid=" + item.letter.id + "&userid=" + this.$store.state.user.userInfo.id
                 var socket = new WebSocket(letterPath)
@@ -278,13 +286,14 @@ export default {
                 socket.onmessage = this.letterMessage
               })
             }
-            if (letter.list.length < 10) {
-              this.isLetterFinish = !0
-            }
-            this.letterList = this.letterList.concat(letter.list)
+            this.letterList = letterList
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("letter/getLetterList", letter_param)
@@ -307,6 +316,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("letterMsg/getLetterMsgList", letter_param)
@@ -392,9 +405,16 @@ export default {
 .customCard{
   background: #DFE4ED;
   margin-bottom: 10px;
+  width: auto;
 }
 #letter{
   width: 100%;
+}
+.customConversition{
+  display: flex;
+}
+.rightLetterMsg{
+  flex-direction: row-reverse;
 }
 .userListWrap{
   width: 100%;

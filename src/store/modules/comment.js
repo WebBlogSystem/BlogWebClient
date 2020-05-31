@@ -1,5 +1,4 @@
 import commentApi from '@/api/commentApi'
-import ViewUI from 'view-design'
 
 const state = {
   // EssayList模块样式: 0主页文章列表  1个人中心 2 其他用户文章列表
@@ -31,7 +30,7 @@ const actions = {
           data = data.res
           param.success(data.list)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -45,7 +44,7 @@ const actions = {
         if (data.flag) {
           param.success()
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -60,7 +59,7 @@ const actions = {
           data = data.res
           param.success(data)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()

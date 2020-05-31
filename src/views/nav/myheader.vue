@@ -50,6 +50,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: url("../../static/Header.png");
 }
 .headerMenu{
   width: 100%;

@@ -192,6 +192,10 @@ export default {
                 },
                 fail: () => {
                   _this.$router.push("/logincenter/login")
+                },
+                actionError: (info) => {
+                  _this.$store.commit("switchLoading", !1)
+                  _this.$Message.error(info)
                 }
               })
               _this.$Message.success('Success!')
@@ -211,6 +215,7 @@ export default {
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
+        var _this = this
         this.$refs[name].validate((valid) => {
           if (valid) {
             this.$store.dispatch("user/setPassword", {
@@ -223,6 +228,10 @@ export default {
               },
               fail: () => {
                 this.$router.push("/logincenter/login")
+              },
+              actionError: (info) => {
+                _this.$store.commit("switchLoading", !1)
+                _this.$Message.error(info)
               }
             })
           } else {

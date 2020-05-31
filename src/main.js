@@ -6,8 +6,13 @@ import store from './store'
 import ViewUI from 'view-design'
 import 'view-design/dist/styles/iview.css'
 import { sstorage } from '@/store/storage'
-
+import SlideVerify from 'vue-monoplasty-slide-verify'
+import VCalendar from 'v-calendar'
+Vue.use(VCalendar, {
+  componentPrefix: 'vc'
+})
 Vue.use(ViewUI)
+Vue.use(SlideVerify)
 Vue.config.productionTip = false
 Vue.mixin({
   methods

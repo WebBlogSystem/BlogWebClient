@@ -30,5 +30,17 @@ export default {
       sex: param.sex,
       intro: param.intro
     })
+  },
+  getRecommendUser (param) {
+    return axios.post('/user/getRecommendUser', {
+      page: param.page,
+      userId: param.userId,
+      search: param.search,
+      pageSize: param.pageSize
+    })
+  },
+  startSession (param) {
+    return axios.post("/user/startSession")
   }
+
 }

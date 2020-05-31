@@ -32,6 +32,7 @@ export default {
       this.getImg(this.imgId)
         .then(
           (res) => {
+            console.log(res)
             this.src = res
           }
         )

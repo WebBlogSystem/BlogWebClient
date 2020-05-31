@@ -5,12 +5,13 @@
         <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
       <div v-else>
-        <Scroll :on-reach-bottom="!isCommentFinish ? bottomAddComment : stopAddComment" height="600">
+        <!-- <Scroll :on-reach-bottom="!isCommentFinish ? bottomAddComment : stopAddComment" height="600"> -->
           <div v-for="(item, index) in commentList" :key="index">
             <Card :bordered="true" class="customCard item">
               <div class="line">
                 <div class="left">
                   <span class="mr10">({{item.comment.createtime}})</span>
+                  <span>({{item.comment.flag === 1 ? "审核通过" : ("审核失败:" + item.comment.checkmsg)}})</span>
                   <Button type="dashed" size="small" @click="deleteComment(item.comment.id, index)">删除评论</Button>
                 </div>
                 <div class="right">
@@ -30,7 +31,7 @@
             <Divider v-if="!(index === (commentList.length - 1))" dashed />
           </div>
           <Divider v-if="isCommentFinish" size="small" class="fs10" dashed>已经到底了</Divider>
-        </Scroll>
+        <!-- </Scroll> -->
       </div>
     </div>
   </div>
@@ -42,6 +43,12 @@ export default {
     ...mapState({
       userInfo: state => state.user.userInfo
     })
+  },
+  mounted () {
+    window.addEventListener('scroll', this.scrollGetMore)
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scrollGetMore)
   },
   data () {
     return {
@@ -56,6 +63,12 @@ export default {
     this.$store.commit("switchLoading", !1)
   },
   methods: {
+    scrollGetMore () {
+      var _this = this
+      if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.body.scrollHeight && !_this.isFinish) {
+        _this.getCommentsByUserId()
+      }
+    },
     goOtherEssayDetail (essay) {
       this.$store.commit("switchLoading", !0)
       this.$router.push({ path: '/otheruser/essaydetail', query: { essayId: essay.id, userId: essay.userId } })
@@ -76,6 +89,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("comment/getCommentsByUserId", commentParams)
@@ -95,9 +112,9 @@ export default {
             _this.commentList.length = (fromPage - 1) * 10
             var pages = []
             if (_this.commentList.length % 10 === 1) {
-              _this.page--
+              _this.commentPage--
             }
-            for (let i = fromPage, j = 0; i <= _this.page; i++, j++) {
+            for (let i = fromPage, j = 0; i <= _this.commentPage; i++, j++) {
               pages[j] = i
             }
             pages = pages.map(item => {
@@ -122,6 +139,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         _this.$store.dispatch("comment/deleteComment", commentParams)

@@ -1,10 +1,10 @@
 <template>
   <div class="attention">
-    <div class="attentionList">{{attentionList.lengt}}
+    <div class="attentionList">
       <div v-if="attentionList.length <= 0">
         <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
-      <div v-else v-for="(item, index) in attentionList" :key="index">
+      <div v-else v-for="(item, index) in attentionList" :key="index" style="width: 200px;">
         <Card :bordered="true" class="customCard item">
           <div class="line" @click="goUserIndex(item)">
             <avatar :imgId="item.imgid"/>
@@ -59,6 +59,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("attention/getAttentions", attention_param)
@@ -69,6 +73,7 @@ export default {
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
+        var _this = this
         var attention_param = {
           fromUserId: this.userInfo.id,
           toUserId: userId,
@@ -78,6 +83,10 @@ export default {
           },
           fail: () => {
             this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("attention/deleteAttention", attention_param)
@@ -95,6 +104,7 @@ export default {
 }
 .attention .item{
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     margin-right:20px;
     margin-bottom: 20px;

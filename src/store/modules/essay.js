@@ -1,5 +1,4 @@
 import essayApi from '@/api/essayApi'
-import ViewUI from 'view-design'
 
 const state = {
   // EssayList模块样式: 0主页文章列表  1个人中心 2 其他用户文章列表
@@ -39,10 +38,9 @@ const actions = {
       var data = response.data
       if (data.islogin) {
         if (data.flag) {
-          ViewUI.Message.success(data.info)
-          param.success()
+          param.success(data.info)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -56,7 +54,7 @@ const actions = {
         if (data.flag) {
           param.success(data.info)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -68,10 +66,9 @@ const actions = {
       var data = response.data
       if (data.islogin) {
         if (data.flag) {
-          ViewUI.Message.success(data.info)
-          param.success()
+          param.success(data.info)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -107,7 +104,7 @@ const actions = {
           data = data.res
           param.success()
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -122,7 +119,7 @@ const actions = {
           data = data.res
           param.success()
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -137,7 +134,7 @@ const actions = {
           data = data.res
           param.success(data)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -152,7 +149,7 @@ const actions = {
           data = data.res
           param.success(data)
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()

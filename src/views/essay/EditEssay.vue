@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="editEssay">
     <!-- <div v-html="formAddEssay.contentObj.html"></div> -->
      <Form ref="formEditEssay" :model="formEditEssay" :rules="ruleEditEssay" hide-required-mark>
@@ -44,6 +44,7 @@ export default {
   },
   methods: {
     getEssay () {
+      var _this = this
       var essayId = this.$route.query.essayId
       var essay_param = {
         essayId,
@@ -55,6 +56,10 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getEssayByEssayId", essay_param)
@@ -76,6 +81,10 @@ export default {
             },
             fail: () => {
               _this.$router.push("/logincenter/login")
+            },
+            actionError: (info) => {
+              _this.$store.commit("switchLoading", !1)
+              _this.$Message.error(info)
             }
           }
           _this.$refs[name].validate((valid) => {

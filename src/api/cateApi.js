@@ -3,7 +3,8 @@ import axios from "./networkAxios"
 export default {
   getCatesByUserId (param) {
     return axios.post("/user/getCatesByUserId", {
-      userId: param.userId
+      userId: param.userId,
+      flag: param.flag
     })
   },
   addEssayCate (param) {

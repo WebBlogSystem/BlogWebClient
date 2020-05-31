@@ -21,9 +21,9 @@ export var methods = {
     promise = await axios.all(promises)
       .then(axios.spread(function (...result) {
         if (imgIds instanceof Array) {
-          res = result.map(item => process.env.VUE_APP_domain + item.data.res)
+          res = result.map(item => item.data.res)
         } else {
-          res = process.env.VUE_APP_domain + result[0].data.res
+          res = result[0].data.res
         }
         return Promise.resolve(res)
       }))

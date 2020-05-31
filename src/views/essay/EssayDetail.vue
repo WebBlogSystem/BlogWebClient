@@ -1,38 +1,63 @@
 <template>
   <div class="essayDetail">
     <div>
-      <div class="fs40 fc">{{essay.title}}</div>
-      <span>{{essay.createtime}}</span>
-    </div>
-    <div>
-      <span>作者:</span>
-      <span class="ml10">{{user.username}}</span>
-    </div>
-    <div class="tagsWrapper">
-    <span class="mr10 spanTag">标签:</span><Tag color="#57a3f3" class="mr10" v-for="(cate, index) in cateListOfEssay" :key="index" type="border">{{cate.name}}</Tag>
-    </div>
-    <div v-if="content.html">
-      <editor v-model="content"></editor>
-    </div>
-    <div v-if="essay.flag === 1">
-      <div v-if="upOrDown === 1">
-        <Icon type="ios-thumbs-up" size="24"/>({{up.up}})|<Icon type="ios-thumbs-down-outline" size="24" @click="updateUp(essay.id, -1)"/>({{up.down}})
+      <div>
+        <div class="fs40 fc">{{essay.title}}</div>
+        <span>{{essay.createtime}}</span>
       </div>
-      <div v-if="upOrDown === -1">
-        <Icon type="ios-thumbs-up-outline" size="24" @click="updateUp(essay.id, 1)"/>({{up.up}})|<Icon type="ios-thumbs-down" size="24"/>({{up.down}})
+      <div>
+        <span>作者:</span>
+        <span class="ml10">{{user.username}}</span>
       </div>
-      <div v-if="upOrDown === 0">
-        <Icon type="ios-thumbs-up-outline" size="24" @click="updateUp(essay.id, 1)"/>({{up.up}})|<Icon type="ios-thumbs-down-outline" size="24" @click="updateUp(essay.id, -1)"/>({{up.down}})
+      <div class="tagsWrapper">
+        <span class="mr10 spanTag">标签:</span><Tag color="#57a3f3" class="mr10" v-for="(cate, index) in cateListOfEssay" :key="index" type="border">{{cate.name}}</Tag>
       </div>
-    </div>
-    <Divider />
-    <div v-if="essay.flag === 1">
-      <Button type="primary" shape="circle" @click="addComments(essay.id)">发表评论</Button>
+      <div v-if="content.html">
+        <editor v-model="content"></editor>
+      </div>
       <Divider />
-      <div v-for="(item, index) in commentList" :key="index">
-        <comment :comment="item"></comment>
+      <div v-if="essay.flag === 1">
+        <div class="essayOpe" id="addComment">
+          <Button type="primary" shape="circle" @click="addComments(essay.id)">发表评论</Button>
+        </div>
+        <Divider />
+        <div v-for="(item, index) in commentList" :key="index">
+          <comment :comment="item"></comment>
+        </div>
+        <Page v-if="commentTotalPage > 1" :current="commentPage" :total="commentTotalCount" @on-change="getCommentsByEssayId" simple />
       </div>
-      <Page v-if="commentTotalPage > 1" :current="commentPage" :total="commentTotalCount" @on-change="getCommentsByEssayId" simple />
+    </div>
+    <div v-if="essay.flag === 1" class="right">
+      <div v-if="upOrDown === 1">
+        <div class="mb10">
+          <a><Icon type="md-thumbs-up" size="30"/>赞({{up.up}})</a>
+        </div>
+        <div class="mb10">
+          <a><Icon type="ios-thumbs-down-outline" size="30" @click="updateUp(essay.id, -1)"/>踩({{up.down}})</a>
+        </div>
+      </div>
+      <div v-if="upOrDown === -1" class="mb10">
+        <div class="mb10">
+          <a><Icon type="ios-thumbs-up-outline" size="30" @click="updateUp(essay.id, 1)"/>赞({{up.up}})</a>
+        </div>
+        <div class="mb10">
+          <a><Icon type="md-thumbs-down" size="30"/>踩({{up.down}})</a>
+        </div>
+      </div>
+      <div v-if="upOrDown === 0" class="mb10">
+        <div class="mb10">
+          <a><Icon type="ios-thumbs-up-outline" size="30" @click="updateUp(essay.id, 1)"/>赞({{up.up}})</a>
+        </div>
+        <div class="mb10">
+          <a><Icon type="ios-thumbs-down-outline" size="30" @click="updateUp(essay.id, -1)"/>踩({{up.down}})</a>
+        </div>
+      </div>
+      <div class="mb10">
+        <a href="#addComment"><Icon type="ios-text-outline"  size="30" />评论</a>
+      </div>
+      <div data-clipboard-action="copy" @click="copy" :data-clipboard-text="currentUrl" class="shareEssay mb10">
+        <a><Icon type="md-share"  size="30"/>分享</a>
+      </div>
     </div>
   </div>
 </template>
@@ -40,6 +65,7 @@
 import { mapState } from "vuex"
 import comment from "@/components/essay/Comment"
 import editor from "@/components/editor/Editor"
+import ClipBoard from 'clipboard'
 export default {
   computed: {
     ...mapState({
@@ -62,7 +88,8 @@ export default {
         txt: "",
         html: "",
         isEditable: false
-      }
+      },
+      currentUrl: process.env.VUE_APP_LOCAL + "/otheruser/essaydetail?userId=" + this.$route.query.userId + "&" + "essayId=" + this.$route.query.essayId
     }
   },
   created () {
@@ -87,6 +114,7 @@ export default {
   },
   methods: {
     getUpOrDown (essayId, userId) {
+      var _this = this
       var up_param = {
         essayId,
         userId,
@@ -97,11 +125,16 @@ export default {
         },
         fail: () => {
           this.$router.push("/logincenter/login")
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getUpOrDown", up_param)
     },
     getUps (essayId) {
+      var _this = this
       var up_param = {
         essayId,
         success: (up) => {
@@ -109,6 +142,10 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getUps", up_param)
@@ -151,11 +188,16 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("essay/getEssayByEssayId", essay_params)
     },
     getCommentsByEssayId (pageIndex) {
+      var _this = this
       var comments_param = {
         essayId: this.essay.id,
         page: pageIndex,
@@ -167,11 +209,16 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("comment/getCommentsByEssayId", comments_param)
     },
     getUser (userId) {
+      var _this = this
       var user_params = {
         userId,
         success: (res) => {
@@ -179,11 +226,16 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("user/getUserByUserId", user_params)
     },
     getCatesByEssay (essayId) {
+      var _this = this
       var cate_params = {
         essayId,
         success: (list) => {
@@ -191,6 +243,10 @@ export default {
         },
         fail: (info) => {
           this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
+          _this.$Message.error(info)
         }
       }
       this.$store.dispatch("cate/getCatesByEssay", cate_params)
@@ -226,9 +282,14 @@ export default {
                   _this.msg = ""
                   _this.getCommentsByEssayId(1)
                   this.$store.commit("switchLoading", !1)
+                  this.$Message.success("正在审核你的评论,审核通过你将获得2点活跃值")
                 },
                 fail: () => {
                   _this.$router.push("/logincenter/login")
+                },
+                actionError: (info) => {
+                  _this.$store.commit("switchLoading", !1)
+                  _this.$Message.error(info)
                 }
               }
               _this.$store.dispatch("comment/addComments", comment_param)
@@ -257,10 +318,23 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         _this.$store.dispatch("essay/updateUp", upParam)
       }
+    },
+    copy () {
+      var _this = this
+      console.log("开始copy.....")
+      var clipboard = new ClipBoard('.shareEssay')
+      clipboard.on('success', e => {
+        _this.$Message.success("复制链接成功,赶快去分享给其他人吧!!!")
+        clipboard.destroy()
+      })
     }
   }
 }
@@ -287,5 +361,17 @@ export default {
 .tagsWrapper{
   display: flex;
   flex-wrap: wrap;
+}
+.essayOpe{
+  display: flex;
+  justify-content: space-between;
+}
+.essayDetail{
+  position: relative;
+}
+.right{
+  position: fixed;
+  right: 385px;
+  top: 50%;
 }
 </style>

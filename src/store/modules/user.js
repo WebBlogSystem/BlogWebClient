@@ -1,4 +1,3 @@
-import ViewUI from 'view-design'
 import { sstorage } from '../storage'
 import loginApi from '@/api/loginApi'
 import userApi from '@/api/userApi'
@@ -17,6 +16,19 @@ const getters = {
 
 // actions
 const actions = {
+  startSession ({ commit, state }, param) {
+    userApi.startSession(param)
+  },
+  getRecommendUser ({ commit, state }, param) {
+    userApi.getRecommendUser(param).then((response) => {
+      var data = response.data
+      if (data.flag) {
+        param.success(data.res)
+      } else {
+        param.fail(data.info)
+      }
+    })
+  },
   userLogin ({ commit, state }, param) {
     loginApi.userLogin(param.formLogin).then((response) => {
       var data = response.data
@@ -35,7 +47,7 @@ const actions = {
         if (data.flag) {
           param.success()
         } else {
-          ViewUI.Message.error(data.info)
+          param.actionError(data.info)
         }
       } else {
         param.fail()
@@ -50,7 +62,7 @@ const actions = {
           if (data.flag) {
             param.success(data.res)
           } else {
-            ViewUI.Message.error(data.info)
+            param.actionError(data.info)
           }
         } else {
           param.fail()
@@ -107,14 +119,6 @@ const mutations = {
   setUserInfo (state, userInfo) {
     sstorage.setItem('user', JSON.stringify(userInfo))
     state.userInfo = userInfo
-  },
-  setOtherUser (state, userInfo) {
-    state.otherInfo = userInfo
-  },
-  reset (state) {
-    state.userInfo = {}
-    state.otherInfo = {}
-    state.leftCurrent = '1'
   }
 }
 

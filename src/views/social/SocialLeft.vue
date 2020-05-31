@@ -17,6 +17,10 @@
                 <Icon type="md-chatbubbles" />
                 粉丝
             </MenuItem>
+            <MenuItem name="6">
+                <Icon type="md-chatbubbles" />
+                赞文
+            </MenuItem>
             <MenuItem name="5">
                 <Icon type="md-chatbubbles" />
                 云信
@@ -56,6 +60,9 @@ export default {
         case '5':
           path = 'letter'
           break
+        case '6':
+          path = 'upessay'
+          break
         default:
           path = 'comment'
       }
@@ -70,5 +77,6 @@ export default {
 <style scoped>
 .customSocial{
   background-color: transparent;
+  width: 140px !important;
 }
 </style>

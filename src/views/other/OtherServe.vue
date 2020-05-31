@@ -23,10 +23,13 @@ export default {
   /* justify-content: center; */
 }
 .otherServe .left{
-  margin-top:20px;
+  position: fixed;
+  left: 300px;
 }
 .otherServe .right{
   padding-left: 10px;
   width: 75%;
+  position: relative;
+  left: 150px;
 }
 </style>

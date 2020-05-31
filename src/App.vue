@@ -11,7 +11,7 @@
       <router-view></router-view>
     </div>
     <div id="footerWrap">
-      MiniBlog(vue+MVC),需要源代码请联系qq:1306104920
+      <span class="fs fc">MiniBlog(vue+MVC),需要源代码请联系qq:1306104920</span>
     </div>
   </div>
 </template>
@@ -46,15 +46,26 @@ export default {
   bottom:0;
   left:0;
   right:0;
-  z-index: 20000;
+  z-index: 250;
 }
 #contentWrap{
   width: 960px;
   margin: 0 auto;
 }
-#contentWrap,
+#contentWrap{
+  margin-bottom: 20px;
+  margin-top:80px;
+}
 #footerWrap{
-  margin-top: 20px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+#headerWrap{
+  position: fixed;
+  top:0;
+  width:100%;
+  z-index: 1000;
 }
 </style>
 <style>
@@ -67,12 +78,14 @@ export default {
 .fc{
   color: #57a3f3;
 }
+.fs{
+  font-size: 20px;
+}
 html{
   height: 100%;
 }
 body{
   background-image: url("./assets/blue-snow.png");
-  height: 100%;
   background-attachment: fixed;
 }
 .bgImg{

@@ -9,13 +9,13 @@
           <img :src="require('@/static/No.jpg')" height="100%" width="100%">
         </div>
         <div v-else>
-          <Scroll :on-reach-bottom="!isReplyFinish ? bottomAddReply : stopAddReply" height="600">
+          <!-- <Scroll :on-reach-bottom="!isReplyFinish ? bottomAddReply : stopAddReply" height="600"> -->
             <div class="replyList" v-for="(item,index) in replyList" :key="index">
               <Card :bordered="true" class="customCard item">
                 <div class="line">
                   <div class="top">
                       <span class="mr10">({{item.reply.createtime}}):</span>
-                      <Button type="dashed" @click="deleteReply(item.reply.id, index)">删除回复</Button>
+                      <Button v-if="flag === 0" type="dashed" @click="deleteReply(item.reply.id, index)">删除回复</Button>
                   </div>
                   <div class="bottom" v-if="flag === 0">
                     <span class="mr10">您在</span>
@@ -43,7 +43,7 @@
               <Divider v-if="!(index === (replyList.length-1))" dashed />
             </div>
             <Divider v-if="isReplyFinish && replyList.length > 0" size="small" class="fs10" dashed>已经到底了</Divider>
-          </Scroll>
+          <!-- </Scroll> -->
         </div>
       </div>
     </div>
@@ -91,18 +91,14 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("reply/getReplyByUserId", reply_param)
       }
-    },
-    bottomAddReply () {
-      return new Promise(resolve => {
-        this.getReplyByUserId()
-        resolve()
-      })
-    },
-    stopAddReply () {
     },
     deleteReply (replyId, replyIndex) {
       this.$store.commit("switchLoading", !0)
@@ -118,9 +114,9 @@ export default {
             this.replyList.length = (fromPage - 1) * 10
             var pages = []
             if (this.replyList.length % 10 === 1) {
-              this.page--
+              this.replyPage--
             }
-            for (let i = fromPage, j = 0; i <= this.page; i++, j++) {
+            for (let i = fromPage, j = 0; i <= this.replyPage; i++, j++) {
               pages[j] = i
             }
             pages = pages.map(item => {
@@ -137,6 +133,7 @@ export default {
             })
             Promise.all(pages).then(function (replyList) {
               replyList.map(item => {
+                console.log(item)
                 _this.replyList = _this.replyList.concat(item)
                 _this.isFinish = item.length < 10
               })
@@ -145,6 +142,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("reply/deleteReply", reply_param)
@@ -156,6 +157,12 @@ export default {
       this.isReplyFinish = 0
       this.replyList = []
       this.getReplyByUserId()
+    },
+    scrollGetMore () {
+      var _this = this
+      if (document.documentElement.scrollTop + document.documentElement.clientHeight >= document.body.scrollHeight && !_this.isFinish) {
+        _this.getReplyByUserId()
+      }
     }
   },
   data () {
@@ -166,6 +173,12 @@ export default {
       // 0表示我回复的 1表示回复我的
       flag: 0
     }
+  },
+  mounted () {
+    window.addEventListener('scroll', this.scrollGetMore)
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scrollGetMore)
   }
 }
 </script>

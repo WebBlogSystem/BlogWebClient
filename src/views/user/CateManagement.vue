@@ -1,6 +1,6 @@
 <template>
   <div class="cateManagement">
-    <Button class="btn" type="dashed" @click="addCate">添加分类</Button>
+    <Button class="btn addCate" type="dashed" @click="addCate">添加分类</Button>
     <div class="lineWrap">
       <div v-if="cateList.length <= 0">
         <img :src="require('@/static/No.jpg')" height="100%" width="100%">
@@ -9,15 +9,18 @@
         <div v-for="(cate, cateIndex) in cateList" :key="cateIndex" class="tagWrapper">
           <Card style="width:200px" class="customCard">
             <Tag slot="title" size="large" color="#2d8cf0" type="border">
-              {{cate.name}}
+              {{cate.cate.name}}
             </Tag>
-            <Dropdown placement="right-start">
+            <div>
+              共有{{cate.nums}}篇文章
+            </div>
+            <Dropdown placement="right-end">
               <Button type="dashed">标签操作</Button>
               <DropdownMenu slot="list">
-                <DropdownItem @click.native="editCate(cate, cateIndex)">修改标签</DropdownItem>
-                <DropdownItem @click.native="changeShow(1, cate)">添加文章</DropdownItem>
-                <DropdownItem @click.native="changeShow(2, cate)">删除文章</DropdownItem>
-                <DropdownItem @click.native="deleteCate(cate, cateIndex)">删除标签</DropdownItem>
+                <DropdownItem @click.native="editCate(cate.cate, cateIndex)">修改标签</DropdownItem>
+                <DropdownItem @click.native="changeShow(1, cate.cate)">添加文章</DropdownItem>
+                <DropdownItem @click.native="changeShow(2, cate.cate)">删除文章</DropdownItem>
+                <DropdownItem @click.native="deleteCate(cate.cate, cateIndex)">删除标签</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </Card>
@@ -74,10 +77,15 @@ export default {
       var _this = this
       var cate_param = {
         userId: _this.userInfo.id,
+        flag: 0,
         success: (list) => {
           _this.cateList = _this.cateList.concat(list)
         },
         fail: (info) => {
+          _this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
           _this.$Message.error(info)
         }
       }
@@ -105,6 +113,10 @@ export default {
           fail: (info) => {
             _this.$Message.error(info)
             _this.$store.commit("switchLoading", !1)
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         if (isShow === 1) {
@@ -128,6 +140,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         })
       }
@@ -147,6 +163,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         })
       }
@@ -155,6 +175,7 @@ export default {
       if (!this.userInfo.id) {
         this.$router.push("/logincenter/login")
       } else {
+        var _this = this
         this.$Modal.confirm({
           render: (h) => {
             return h('Input', {
@@ -170,17 +191,18 @@ export default {
             })
           },
           onOk: () => {
-            this.$store.commit("switchLoading", !0)
-            var _this = this
             _this.$store.dispatch("cate/addCate", {
               name: _this.cateName,
               userId: _this.userInfo.id,
               success: (cate) => {
                 _this.cateList.unshift(cate)
-                _this.$store.commit("switchLoading", !1)
               },
               fail: () => {
                 _this.$router.push("/logincenter/login")
+              },
+              actionError: (info) => {
+                _this.$store.commit("switchLoading", !1)
+                _this.$Message.error(info)
               }
             })
           },
@@ -211,6 +233,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         _this.$store.dispatch("cate/deleteCate", cate_param)
@@ -248,6 +274,10 @@ export default {
                 },
                 fail: () => {
                   _this.$router.push("/logincenter/login")
+                },
+                actionError: (info) => {
+                  _this.$store.commit("switchLoading", !1)
+                  _this.$Message.error(info)
                 }
               })
             }
@@ -266,6 +296,7 @@ export default {
   margin-left: 30px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .customCard{
   background: #DFE4ED;
@@ -307,5 +338,11 @@ export default {
 .tagWrapper{
   margin-left: 20px;
   margin-top: 10px;
+}
+.addCate{
+  position: fixed;
+  z-index:100;
+  top:118px;
+  right:354px;
 }
 </style>

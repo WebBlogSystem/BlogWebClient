@@ -11,6 +11,7 @@
           <div @click="goPath('2')"><DropdownItem>回复</DropdownItem></div>
           <div @click="goPath('3')"><DropdownItem>关注</DropdownItem></div>
           <div @click="goPath('4')"><DropdownItem>粉丝</DropdownItem></div>
+          <div @click="goPath('6')"><DropdownItem>赞文</DropdownItem></div>
           <div @click="goPath('5')">
             <DropdownItem>
               <div class="letter">
@@ -91,6 +92,9 @@ export default {
           break
         case '5':
           path = 'letter'
+          break
+        case '6':
+          path = 'upessay'
           break
         default:
           path = 'comment'

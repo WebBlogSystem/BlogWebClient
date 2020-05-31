@@ -1,5 +1,6 @@
 <template>
-    <Menu :active-name="leftCurrent+''" @on-select="onSelect" class="customUser">
+  <div>
+     <Menu :active-name="leftCurrent+''" @on-select="onSelect" class="customUser">
         <MenuGroup title="个人中心">
             <MenuItem name="1">
                 <Icon type="md-chatbubbles" />
@@ -19,6 +20,7 @@
             </MenuItem>
         </MenuGroup>
     </Menu>
+  </div>
 </template>
 <script>
 import { mapState } from 'vuex'
@@ -60,5 +62,7 @@ export default {
 <style scoped>
 .customUser{
   background-color: transparent;
+  position: fixed;
+  width: 190px !important;
 }
 </style>

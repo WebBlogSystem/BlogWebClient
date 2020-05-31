@@ -10,7 +10,7 @@
           <div @click="goUser('2')"><DropdownItem>博客管理</DropdownItem></div>
           <div @click="goUser('3')"><DropdownItem>标签管理</DropdownItem></div>
           <div @click="goUser('4')"><DropdownItem>个人资料</DropdownItem></div>
-          <div ><DropdownItem>活跃值:<span class="fc">{{userInfo.point}}</span></DropdownItem></div>
+          <div ><DropdownItem>活跃值:<span class="fc">{{userInfo.point}} (LV.{{getUserLevel}})</span></DropdownItem></div>
       </DropdownMenu>
     </Dropdown>
     <avatar :imgId="userInfo.imgid"/>
@@ -38,7 +38,23 @@ export default {
   computed: {
     ...mapState({
       userInfo: state => state.user.userInfo
-    })
+    }),
+    getUserLevel () {
+      var score = this.userInfo.sumpoint
+      if (score >= 0 && score <= 100) {
+        return 1
+      } else if (score <= 500) {
+        return 2
+      } else if (score <= 1000) {
+        return 3
+      } else if (score <= 5000) {
+        return 4
+      } else if (score > 5000) {
+        return "△"
+      } else {
+        return "账户异常"
+      }
+    }
   },
   methods: {
     initWebSocket () {

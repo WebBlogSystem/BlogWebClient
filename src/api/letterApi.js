@@ -9,8 +9,7 @@ export default {
   },
   getLetterByUserId (param) {
     return axios.post("/user/getLetterByUserId", {
-      userId: param.userId,
-      page: param.page
+      userId: param.userId
     })
   },
   addLetter (param) {

@@ -5,7 +5,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    component: () => import('@/views/essay/EssayList')
+    component: () => import('@/views/home/HomeServe')
   },
   {
     path: '/logincenter',
@@ -53,6 +53,10 @@ const routes = [
     ]
   },
   {
+    path: '/search',
+    component: () => import("@/views/home/Search")
+  },
+  {
     path: '/otheruser',
     component: () => import('@/views/other/OtherServe'),
     children: [
@@ -94,6 +98,10 @@ const routes = [
         path: 'letter',
         component: () => import('@/views/social/Letter'),
         meta: { requiresAuth: true }
+      },
+      {
+        path: 'upessay',
+        component: () => import('@/views/social/UpEssay')
       }
     ]
   },

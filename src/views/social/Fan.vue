@@ -4,8 +4,8 @@
       <div v-if="fanList.length <= 0">
         <img :src="require('@/static/No.jpg')" height="100%" width="100%">
       </div>
-      <div v-else>
-        <div v-for="(item, index) in fanList" :key="index" @click="goUserIndex(item)">
+      <div v-else class="fanListWrapper">
+        <div v-for="(item, index) in fanList" :key="index" @click="goUserIndex(item)" style="width: 200px;">
           <Card :bordered="true" class="customCard item">
             <div class="line">
               <avatar :imgId="item.imgid"/>
@@ -56,6 +56,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("fan/getFans", fan_param)
@@ -79,5 +83,11 @@ export default {
     flex-grow: 0;
     flex-shrink: 0;
     text-align: center;
+}
+.fanListWrapper{
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 </style>

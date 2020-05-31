@@ -1,17 +1,25 @@
-<template>
+﻿<template>
   <div class="otherLeft">
     <div class="leftTop">
-      <div class="line">
-          <div v-if="user.imgid || user.imgid == 0">
-            <avatar :imgId="user.imgid" />
-          </div>
-          <div>{{user.username}}</div>
-      </div>
-      <div class="line btnWrap" v-if="user.id !== userInfo.id">
-        <Button type="info" class="btn" @click="addAttention(user.id)" v-if="!type">关注</Button>
-        <Button type="info" class="btn" @click="deleteAttention(user.id)" v-if="type">取消关注</Button>
-        <Button type="info" @click="addLetter(user.id)" v-if="!letterType">私信</Button>
-      </div>
+      <Card style="width:250px">
+        <div class="line">
+            <div v-if="user.imgid || user.imgid == 0" class="center">
+              <avatar :imgId="user.imgid" />
+            </div>
+            <div class="lineItem">
+              <span>作者:</span>{{user.username}}
+            </div>
+            <div class="lineItem">
+              <span>个人简介:</span>
+              <span class="userInfoBlock">{{user.intro}}</span>
+            </div>
+        </div>
+        <div class="line btnWrap" v-if="user.id !== userInfo.id">
+          <Button type="info" class="btn" @click="addAttention(user.id)" v-if="!type">关注</Button>
+          <Button type="info" class="btn" @click="deleteAttention(user.id)" v-if="type">取消关注</Button>
+          <Button type="info" @click="addLetter(user.id)" v-if="!letterType">私信</Button>
+        </div>
+      </Card>
     </div>
     <div class="leftBottom">
       <!-- <Menu :active-name="cateId" class="customMenu">
@@ -21,17 +29,20 @@
           </MenuItem>
         </MenuGroup>
       </Menu> -->
-      <Menu ref="menus" :active-name="currentCate" :open-names="['4']" class="customMenu">
-          <Submenu name="4">
-              <template slot="title">
-                  <Icon type="ios-cog" />
-                  全部标签
-              </template>
-              <MenuItem v-for="(cate,index) in cateList" :key="index" :name="'4-'+cate.id" @click.native="goCateEssayList(cate.id)">
-                {{cate.name}}
-              </MenuItem>
-          </Submenu>
-      </Menu>
+      <Card style="width:250px">
+          <p slot="title">
+            全部标签
+          </p>
+          <div v-if="cateList.length > 0" class="cateListWrapper">
+            <div v-for="(cate,index) in cateList" :key="index" class="ml10 cateItem" @click="goCateEssayList(cate.cate.id)">
+              <div><a>{{cate.cate.name}}</a></div>
+              <div>{{cate.nums}}篇</div>
+            </div>
+          </div>
+          <div v-else>
+            当前用户暂无标签
+          </div>
+      </Card>
     </div>
   </div>
 </template>
@@ -60,11 +71,7 @@ export default {
   },
   watch: {
     $route (to, from) {
-      this.user = {}
-      this.type = 0
-      this.cateList = []
       this.currentCate = '4-' + (this.$route.query.cateId ? (+this.$route.query.cateId) : 0)
-      this.letterType = 0
       this.initData()
     }
   },
@@ -93,6 +100,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         _this.$store.dispatch("letter/getLetter", letter_param)
@@ -113,6 +124,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         _this.$store.dispatch("attention/addAttention", attention_param)
@@ -133,6 +148,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("attention/deleteAttention", attention_param)
@@ -140,6 +159,7 @@ export default {
     },
     goCateEssayList (cateId) {
       if (('4-' + cateId) !== this.currentCate) {
+        console.log(cateId)
         this.$store.commit("switchLoading", !0)
         this.$router.replace({ path: "/otheruser/essaylist", query: { userId: this.user.id, cateId } })
       }
@@ -156,6 +176,10 @@ export default {
           }
         },
         fail: (info) => {
+          _this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
           _this.$Message.error(info)
         }
       }
@@ -178,6 +202,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("attention/getAttention", attentionParams)
@@ -187,10 +215,15 @@ export default {
       var _this = this
       var cate_params = {
         userId,
+        flag: 1,
         success: (res) => {
-          _this.cateList = _this.cateList.concat(res)
+          _this.cateList = res
         },
         fail: (info) => {
+          _this.$Message.error(info)
+        },
+        actionError: (info) => {
+          _this.$store.commit("switchLoading", !1)
           _this.$Message.error(info)
         }
       }
@@ -210,6 +243,10 @@ export default {
           },
           fail: () => {
             _this.$router.push("/logincenter/login")
+          },
+          actionError: (info) => {
+            _this.$store.commit("switchLoading", !1)
+            _this.$Message.error(info)
           }
         }
         this.$store.dispatch("letter/addLetter", letter_param)
@@ -225,26 +262,60 @@ export default {
 .fs10{
   font-size: 10px;
 }
-.otherLeft{
+.cateItem{
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+}
+.center{
+  text-align: center;
+}
+.cateListWrapper{
+  height: 300px;
+  overflow-y:auto;
 }
 .otherLeft .btnWrap{
   margin-top:10px;
+  display: flex;
+  justify-content: space-around;
 }
 .otherLeft .btnWrap .btn:first-child{
   margin-right:20px;
 }
 .otherLeft .leftTop .line{
-  text-align: center;
+  word-wrap: break-word;
+  word-break: normal;
 }
 .otherLeft .leftBottom{
-  text-align: center;
+  margin-top:50px;
 }
 .customMenu{
   background-color: transparent;
   margin-top: 20px;
   margin-right: 32px;
+}
+.lineItem{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.leftTop .lineItem:not(.avatar) span:first-child{
+    margin-right: 10px;
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+}
+.lineItem{
+  display: flex;
+}
+.userInfoBlock{
+  display: inline-block;
+  width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 </style>

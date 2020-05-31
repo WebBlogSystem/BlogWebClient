@@ -9,17 +9,24 @@
 export default {
   data () {
     return {
-      txt: ''
+      txt: ""
     }
   },
-  created () {
-    var query = this.$route.query.search
-    this.txt = query
+  watch: {
+    "$route.query.search" (newVal, oldVal) {
+      console.log(newVal)
+      this.txt = newVal
+    }
   },
   methods: {
     searchEssay () {
       this.$store.commit("switchLoading", !0)
-      this.$router.push({ path: "/", query: { search: this.txt } })
+      if (this.txt !== '') {
+        this.$router.push({ path: "/search", query: { search: this.txt } })
+      } else {
+        this.$router.push("/")
+      }
+      this.$store.commit("switchLoading", !1)
     }
   }
 }
